@@ -3,6 +3,11 @@
 Demo link (temporary site hosted by Tempo Labs)
 https://preview.tempolabs.ai/8a9c3a63-a059-4993-9507-048773744a92
 
+TODOs
+- Test the flow
+- Test if (how?) this code can be deployed into Refine.dev
+- Check how Refine will push the data into the backend (Passes table in the database)
+
 
 ## React + TypeScript + Vite
 
