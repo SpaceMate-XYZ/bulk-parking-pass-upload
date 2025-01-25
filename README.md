@@ -4,7 +4,7 @@ Demo link (temporary site hosted by Tempo Labs)
 https://preview.tempolabs.ai/8a9c3a63-a059-4993-9507-048773744a92
 
 
-# React + TypeScript + Vite
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
