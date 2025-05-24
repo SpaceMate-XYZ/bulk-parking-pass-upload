@@ -1,0 +1,2911 @@
+// START OF UPDATED schema.prisma FILE
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Database configuration (using PostgreSQL)
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Configuration for generating Prisma classes
+generator prismaClassGenerator {
+  provider               = "prisma-class-generator"
+  dryRun                 = "false"
+  separateRelationFields = "true"
+  output                 = "../src/prisma/prisma.generated"
+}
+
+// Enums remain the same as originally provided...
+// ==============================================
+// Core System & Authentication Enums
+// ==============================================
+enum UserStatus { UNKNOWN ACTIVE DISABLED }
+enum SyncStatus { PENDING SYNCED FAILED SUCCESS }
+enum DocStatus { ACTIVE DELETED }
+enum AuthSource { LOCAL GOOGLE FACEBOOK TWITTER KEYCLOAK }
+enum DocType { PLACE VISIT INVITE ORGANIZATION ASSET MEETING USER USERORGANIZATION USERPLACE ASSETONORGANIZATION ASSETONPLACE USERPREFERENCE USERNOTIFICATIONPREF USERPROFILE USERSOCIALPROFILE NOTIFICATION USERVERIFICATION MEDIA PASS PARKINGSESSION RATECHART OBSERVATION DEVICE VEHICLE PARKINGCAPACITY SPACETAG PRICETAG VEHICLEAREACODE VISITORBADGE ISSUEDVISITORBADGE COUNTRYSTATECITYLOOKUP REPORTINGTAG MARKETINGTAG ASSETUSAGELOG ASSETMAINTENANCE INVOICEPAYMENT INVOICEITEM AUDITLOG TRANSACTION RECEIPT INVOICE PLACEORGANIZATION SESSION PMSOBSERVATION VMSOBSERVATION PARKINGSPOT PARKINGRECEIPT RESERVATION MARKETINGENROLMENT LANE NOTIFICATIONPROVIDER SUBSCRIBERGROUP NOTIFICATIONOBJECT NOTIFICATIONCHANGE VALETMETRICS VALETSHIFT VEHICLECONDITION PARKINGOCCUPANCY VALETREQUEST PMSSETTING PLACEMETADATA MECHANISHEDPARKINGSHUFFLE QUEUELENGTHLOG VERSION SYNCLOG } // Added new DocTypes
+
+// ==============================================
+// User Profile & Preferences Enums
+// ==============================================
+enum ThemePreference { LIGHT DARK SYSTEM }
+enum Language { EN ES FR DE IT PT HI ZH JA KO OTHER }
+enum Gender { MALE FEMALE }
+enum GenderPronoun { HE HIM HIS SHE HER THEY THEM THEIR }
+enum UserVerificationStatus { VERIFIED NOTVERIFIED }
+enum UserType { ACTIVE DISABLED }
+enum SocialProfileLinkStatus { LINKED UNLINKED PENDING FAILED }
+enum ProfileType { FACEBOOK GOOGLE TWITTER }
+
+// ==============================================
+// Organization & Place Management Enums
+// ==============================================
+enum OrganizationType { OWNER TENANT FACILITY_MANAGER SERVICE_PROVIDER CONTRACTOR VENDOR }
+enum IndustryType { TECHNOLOGY HEALTHCARE MANUFACTURING RETAIL EDUCATION FINANCE REAL_ESTATE HOSPITALITY CONSULTING OTHER }
+enum PlaceType { OFFICE_BUILDING SHOPPING_MALL HOSPITAL HOTEL AIRPORT RESIDENTIAL_COMPLEX EDUCATIONAL_INSTITUTION INDUSTRIAL_PARK BUSINESS_PARK OTHER }
+enum SpecificAreaType { PARKING_AREA DELIVERY_ZONE RIDESHARE_PICKUP_ZONE RIDESHARE_DROPOFF_ZONE VALET_STAND NO_PARKING_ZONE TOW_AWAY_ZONE DISABLED_PARKING_ZONE FLEX_ZONE LOADING_UNLOADING_ZONE }
+enum SupplementalFacilityType { RESTROOM PAYMENT_STATION EV_CHARGING_STATION BIKE_STORAGE SHOWER LOCKER FOODSTORE MEETING_ROOM OTHER_SUPPLEMENTAL_FACILITY }
+enum SpacemateModule { VISITORMANAGEMENT PARKINGMANAGEMENT }
+enum PlaceDepartment { PARKING SECURITY HOUSEKEEPING MAINTENANCE FACILITIES ADMINISTRATION OPERATIONS }
+enum PLACERELATIONSHIP { TENANT OWNER CONTRACTOR VENDOR REMOTE_WORKER CUSTOMER WORKER }
+enum PLACEUSERSTATUS { BLACKLISTED ACTIVE }
+enum PLACEORGSTATUS { BLACKLISTED ACTIVE }
+
+// ==============================================
+// Role & Access Management Enums
+// ==============================================
+enum PMSROLE { ATTENDANT SUPERVISOR MANAGER ADMIN SECURITY VALET CASHIER DRIVER OTHER }
+enum VMSROLE { EMPLOYEE VISITOR }
+enum ORGROLE { EMPLOYEE MANAGER VISITOR OWNER }
+enum PLACEROLE { ADMIN MANAGER ATTENDANT MEMBER }
+enum PlaceWorkerRole { ATTENDANT CASHIER DRIVER SECURITY_GUARD SUPERVISOR MANAGER }
+enum DutyStatus { ON_DUTY LOGGED_OUT ON_LEAVE }
+enum Shift { MORNING DAY EVENING NIGHT }
+
+// ==============================================
+// Parking Management Enums
+// ==============================================
+enum SystemSource { FASTAG RFID ANPR MANUAL MOBILE_APP }
+enum DetectionSystemStatus { OPERATIONAL MAINTENANCE FAILED OFFLINE }
+enum SpotType { SURFACE STACK PUZZLE ROBOTIC TOWER REGULAR PIT ROTARY }
+enum ZoneType { PARKING EV DELIVERY_ZONE RIDESHARE_PICKUP RIDESHARE_DROPOFF VALET_STAND NO_PARKING TOW_AWAY DISABLED_PARKING FLEX_ZONE LOADING_UNLOADING }
+enum ParkedVehicleStatus { IN OUT }
+enum SpaceType { STANDARD HANDICAP EV_CHARGING COMPACT OVERSIZED VALET }
+enum ParkingActivationMode { APP PAY_AND_DISPLAY PAY_BY_PLATE PAY_BY_SPACE PERMIT PASS TICKET }
+enum ParkerType { ALL_USERS COMMUTERS CUSTOMERS DISABLED ELDERLY_USERS EMPLOYEES EVENT_ATTENDEES FAMILIES HANDICAPPED HEARING_IMPAIRED HOTEL_GUESTS RESTAURANT_PATRONS LONG_TERM_PARKERS MEMBERS OTHER OVERNIGHT_PARKERS PARK_AND_CYCLE_USERS PARK_AND_RIDE_USERS PARK_AND_WALK_USERS PARK_AND_FLY_USERS PENSIONERS PREGNANT_WOMEN REGISTERED_DISABLED_USERS RESERVATION_HOLDERS RESIDENTS SEASON_TICKET_HOLDERS SHOPPERS SHORT_TERM_PARKERS SPORT_EVENT_AWAY_SUPPORTERS SPORT_EVENT_HOME_SUPPORTERS STAFF STUDENTS SUBSCRIBERS UNKNOWN VISITORS VISUALLY_IMPAIRED WHEELCHAIR_USERS MEN WOMEN }
+enum OperatingRestriction { BUS_ONLY BUS_STOP CARPOOL_ONLY COMMERCIAL_VEHICLE_ONLY DISABLED_PERMIT_ONLY ELECTRIC_VEHICLE_ONLY GOVERNMENT_VEHICLE_ONLY FREE_PARKING LOADING_ZONE LOADING_ZONE_COMMERCIAL MEDIA NO_PARKING NO_WAITING PARKING_TIME_LIMIT RESIDENTIAL_PERMIT_ONLY SNOW STREET_CLEANING TAXI_ONLY VALET_ONLY }
+
+// ==============================================
+// Pass & Reservation Management Enums
+// ==============================================
+enum PassDuration { DAY MONTH YEAR NO_END_DATE }
+enum PassStatus { ACTIVE EXPIRED SUSPENDED CANCELLED }
+enum PassRestriction { SINGLE_ENTRY SINGLE_OCCUPANCY MAX_DAILY_DURATION }
+enum PassPrivilege { MULTI_VEHICLE FAMILY_PASS CITY_PASS }
+enum PassOwnerType { INDIVIDUAL TENANT ORGANISATION GROUP }
+enum PassType { DAILY MONTHLY YEARLY SEASON_PASS CORPORATE_PASS RESIDENTIAL_PARKING_PERMIT }
+enum ReservationType { PMS VMS ASSET FACILITY }
+
+// ==============================================
+// Vehicle Management Enums
+// ==============================================
+enum RegistrationType { SMART_CARD BOOK OTHER }
+enum VehicleManagement { INDIVIDUAL ORGANISATION FLEET RIDESHARE }
+enum VehicleType { FOUR_WHEELER TWO_WHEELER COMMERCIAL EMERGENCY HANDICAP EV COMMON }
+enum EnergySource { ALL BATTERY BIODIESEL DIESEL DIESEL_BATTERY_HYBRID ETHANOL HYDROGEN LIQUID_GAS LPG METHANE PETROL PETROL_95_OCTANE PETROL_98_OCTANE PETROL_BATTERY_HYBRID PETROL_LEADED PETROL_UNLEADED UNKNOWN OTHER }
+
+// ==============================================
+// Payment & Financial Management Enums
+// ==============================================
+enum PaymentMethod { CASH CARD WALLET PASS FASTAG UPI DIGITAL }
+enum PaymentStatus { PENDING COMPLETED FAILED REFUNDED }
+enum DiscountType { PERCENTAGE FLAT }
+enum PaymentTiming { NA PREPAY PAY_ON_ENTRY PAY_AND_EXIT PAY_PRIOR_EXIT PAY_AFTER_EXIT OTHER }
+enum PriceCalculationSequence { MODIFIER_FIRST DISCOUNT_FIRST PARALLEL }
+enum InvoiceDocType { INVOICE CANCELLATION REVERSAL REFUND CHARGEBACK }
+enum RateType { HOURLY DAILY MONTHLY }
+enum ModifierType { NOCHANGETOPARKINGFARE REPLACEPARKINGCHARGE ADDTOPARKINGCHARGE }
+enum ShoppingBillModifier { EXEMPTONPURCHASEPROOF EXEMPTONMINPURCHASE EXEMPTIFPURCHASEEXCEEDSPARKINGAMOUNT }
+
+// ==============================================
+// Visitor Management Enums
+// ==============================================
+enum VisitType { WALKIN INVITE SCHEDULED WALK_IN DELIVERY OTHER }
+enum VisitCategory { CONSULTANT CONTRACTOR EMPLOYEE GUEST MEETING INTERVIEW APPOINTMENT CHECKUP CONSULTATION REPAIR MAINTENANCE VENDOR DELIVERY PACKAGE }
+enum VisitStatus { PENDING CHECKEDIN CHECKEDOUT }
+enum MeetingType { OFFICIAL PERSONAL ADHOC }
+enum CheckStatus { PENDING COMPLETED CANCELLED NO_SHOW }
+enum BadgeType { PRINTED QR PDF RFID NFC }
+enum BadgeStatus { ACTIVE AVAILABLE ISSUED RETURNED LOST DAMAGED EXPIRED INACTIVE }
+
+// ==============================================
+// Device & Infrastructure Enums
+// ==============================================
+enum DeviceType { ANPR_CAMERA RFID_READER FASTAG_SCANNER BOOM_BARRIER AD_DISPLAY POS CASH_DRAWER PRINTER SCANNER KIOSK TABLET MOBILE }
+enum LaneType { ENTRY EXIT BIDIRECTIONAL EMERGENCY SERVICE VALET FASTAG RFID }
+enum LocationType { CHECKPOINT AREA }
+
+// ==============================================
+// Session & System Management Enums
+// ==============================================
+enum SessionType { PARKING VISITOR PARKING_AND_VISITOR }
+enum PlaceSessionType { PMS VMS FMS EV AMS }
+enum ReferrerType { QR APP WEB KIOSK SMS EMAIL WALK_IN }
+
+// ==============================================
+// Facility & Asset Management Enums
+// ==============================================
+enum MaintenancePriority { P0 P1 P2 P3 P4 P5 }
+enum FacilityType { CONFERENCE_ROOM MEETING_ROOM DESK CUBICLE PARKING_SPOT EV_CHARGER GYM CAFETERIA AUDITORIUM TRAINING_ROOM }
+enum AssetType { MEETINGROOM BOARDROOM HALL PARKING VEHICLE EVCHARGER KEY_CABINET KEY_HOOK PARKING_SLOT CHARGING_POINT }
+enum AssetRelationType { CONTAINER_SLOT SPACE_SUBSPACE UNIT_COMPONENT ROOM_SECTION INDEPENDENT }
+enum AssetHierarchyType { KEY_CABINET_HOOK PARKING_ZONE_SLOT CHARGER_POINT ROOM_SECTION }
+
+// ==============================================
+// Observation & Monitoring Enums
+// ==============================================
+enum VMSObservationType { FACE FINGERPRINT QR VEHICLE_NUMBER CARD RFID }
+enum PMSObservationType { RFID CARD VEHICLE_NUMBER QR PHONE FACE FINGERPRINT }
+enum PMSObservationSource { CAMERA SENSOR ATTENDANT SUPERVISOR CASHIER MANAGER SECURITY VALET }
+
+// ==============================================
+// Notification & Communication Enums
+// ==============================================
+enum NotificationStatus { PENDING SENT DELIVERED READ FAILED CANCELLED }
+enum VerificationMedium { EMAIL SMS }
+
+// ==============================================
+// Media & Document Management Enums
+// ==============================================
+enum DimensionUnit { INCHES METERS }
+enum MediaType { IMAGE VIDEO DOCUMENT }
+enum MediaFieldType { USERPHOTO USERGOVID PLACEPHOTO PLACEGSTCERT PLACEREGISTRATION ORGGSTCERT ORGREGISTRATION VEHPHOTO VEHREGISTRTATION }
+enum ReceiptDeliveryMethod { PRINT LINK }
+enum PrintStatus { PENDING PRINTED FAILED }
+enum InviteStatus { ACCEPTED DECLINED }
+enum NotificationMedium { EMAIL SMS PUSH CHAT }
+
+// ==============================================
+// Reservation & Parking Status Enums
+// ==============================================
+enum ReservationModule { VMS PMS EV FACILITIES }
+enum PeakUsageStatus { OFF_PEAK PEAK SUPER_PEAK }
+enum ReservationStatus { BOOKED PARKED }
+enum ParkingStatus { OCCUPIED AVAILABLE RESERVED }
+enum ParkingSessionStatus { ENTERED EXITED IN OUT }
+enum ProfileStatus { ACTIVE INACTIVE }
+
+// ==============================================
+// Valet Specific Enums
+// ==============================================
+enum ChargingType { NA REGULAR FAST }
+enum CoverType { OPEN ROOF CANOPY }
+enum KeyStorageType { SMART_CABINET KEYHOOKS SLOTS_AND_TOKENS DRAWER_AND_TOKENS PAPER_TAGS }
+enum KeyStatus { WITH_CUSTOMER IN_STORAGE WITH_DRIVER LOST }
+enum ValetStatus { AWAITING_CHECKIN CHECKED_IN RETRIEVING_KEY RETRIEVING_VEHICLE VEHICLE_READY CHECKED_OUT CHECKOUT_REQUESTED CHECKOUT_ACCEPTED DRIVER_ASSIGNED VEHICLE_RETRIEVED }
+enum PlaceParkingType { OPEN SURFACE BASEMENT MULTI_LEVEL MECHANISED HYBRID }
+enum SpecialRestriction { PWD PREGNANT_WOMEN SENIOR_CITIZEN VIP NONE HANDICAP }
+enum ValetDriverStatus { AVAILABLE BUSY ON_BREAK OFF_DUTY }
+enum VehicleConditionStatus { NORMAL MINOR_DAMAGE MAJOR_DAMAGE NEEDS_INSPECTION }
+enum ValetRequestType { CHECKIN CHECKOUT RETRIEVAL RELOCATION }
+
+// ==============================================
+// Notification System Enums (Remain unchanged)
+// ==============================================
+enum NotificationObjectState { PENDING DELIVERED FAILED RETRY_PENDING }
+enum NotificationDeliveryType { PRIORITY DIGEST DELAY }
+enum NotificationChannel { PUSH EMAIL SMS IN_APP WEB CHAT WEB_PUSH EXTERNAL }
+enum NotificationChangeType { SEEN UNSEEN REACTED REPLIED COMMENTED EDITED CREATED DELETED }
+
+
+// ==============================================
+// MODELS START HERE
+// ==============================================
+
+model UserVerification {
+  id            String                 @id @default(cuid())
+  user          User                   @relation(fields: [userId], references: [id])
+  userId        String                 @unique
+  verifMedium   VerificationMedium     @default(EMAIL)
+  verifStatus   UserVerificationStatus @default(NOTVERIFIED)
+  verifCode     String                 @unique @default(uuid())
+  sendDateTime  DateTime               @default(now()) @db.Timestamptz(3)
+  verifDateTime DateTime?              @db.Timestamptz(3)
+  docType       DocType                @default(USERVERIFICATION)
+  docStatus     DocStatus              @default(ACTIVE)
+  createdAt     DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime               @updatedAt @db.Timestamptz(3)
+  deletedAt     DateTime?              @db.Timestamptz(3)
+  createdBy     String?
+  updatedBy     String?
+  deletedBy     String?
+  syncStatus    SyncStatus             @default(PENDING)
+  syncedAt      DateTime?              @db.Timestamptz(3)
+  extraData     Json?
+  extraData1    Json?
+  extraData2    Json?
+  thirdPartyToolData Json?
+}
+
+model UserProfile {
+  id              String          @id @default(cuid())
+  jobTitle        String?
+  pronouns        GenderPronoun[] @default([])
+  dob             DateTime?       @db.Timestamptz(3)
+  bio             String?         @db.Text
+  interests       String[]
+  language        Language        @default(EN)
+  timezone        String?
+  location        String?
+  address         Json?
+  userProfilePics String[]
+  themePreference ThemePreference @default(SYSTEM)
+  gender          Gender?
+  user            User            @relation(fields: [userId], references: [id])
+  userId          String          @unique
+  docType         DocType         @default(USERPROFILE)
+  docStatus       DocStatus       @default(ACTIVE)
+  createdAt       DateTime        @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime        @updatedAt @db.Timestamptz(3)
+  deletedAt       DateTime?       @db.Timestamptz(3)
+  createdBy       String?
+  updatedBy       String?
+  deletedBy       String?
+  syncStatus      SyncStatus      @default(PENDING)
+  syncedAt        DateTime?       @db.Timestamptz(3)
+  extraData       Json?
+  extraData1      Json?
+  extraData2      Json?
+  thirdPartyToolData Json?
+
+  @@index([jobTitle])
+  @@index([language])
+  @@index([location])
+  @@index([timezone])
+}
+
+model UserPreference {
+  id                String    @id @default(cuid())
+  showPosition      Boolean   @default(true)
+  showEmail         Boolean   @default(true)
+  showPhone         Boolean   @default(true)
+  showPronouns      Boolean   @default(true)
+  showDob           Boolean   @default(true)
+  showVehicleNumber Boolean   @default(true)
+  showAddress       Boolean   @default(true)
+  sendEmail         Boolean   @default(false)
+  sendPush          Boolean   @default(false)
+  sendSms           Boolean   @default(false)
+  emailAddress      String?
+  fcmToken          String?
+  phoneNo           String?
+  user              User      @relation(fields: [userId], references: [id])
+  userId            String    @unique
+  docType           DocType   @default(USERPREFERENCE)
+  docStatus         DocStatus @default(ACTIVE)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime? @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  syncStatus        SyncStatus @default(PENDING)
+  syncedAt          DateTime?  @db.Timestamptz(3)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+}
+
+model UserSocialProfile {
+  id            String                  @id @default(cuid())
+  profileType   ProfileType?
+  profileId     String?
+  profileStatus ProfileStatus
+  linkStatus    SocialProfileLinkStatus @default(UNLINKED)
+  user          User                    @relation(fields: [userId], references: [id])
+  userId        String                  @unique
+  docType       DocType                 @default(USERSOCIALPROFILE)
+  docStatus     DocStatus               @default(ACTIVE)
+  createdAt     DateTime                @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime                @updatedAt @db.Timestamptz(3)
+  deletedAt     DateTime?               @db.Timestamptz(3)
+  createdBy     String?
+  updatedBy     String?
+  deletedBy     String?
+  syncStatus    SyncStatus              @default(PENDING)
+  syncedAt      DateTime?               @db.Timestamptz(3)
+  extraData     Json?
+  extraData1    Json?
+  extraData2    Json?
+  thirdPartyToolData Json?
+}
+
+model Reservation {
+  id                      String           @id @default(cuid())
+  user                    User             @relation(name: "ParkingReservation", fields: [userId], references: [id])
+  userId                  String
+  reservationStartTime    DateTime         @db.Timestamptz(3)
+  reservationEndTime      DateTime         @db.Timestamptz(3)
+  reservationDurationMins Int
+  sessionId               String?
+  sessionType             ReservationType
+  meeting                 Meeting?         @relation(fields: [meetingId], references: [id])
+  meetingId               String?
+  reservationStatus       ReservationStatus @default(BOOKED)
+  bookingAmount           Float?
+  bookedAsset             Asset?           @relation(fields: [bookedAssetId], references: [id])
+  bookedAssetId           String
+  docType                 DocType          @default(RESERVATION)
+  docStatus               DocStatus        @default(ACTIVE)
+  createdAt               DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt               DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt               DateTime?        @db.Timestamptz(3)
+  createdBy               String?
+  updatedBy               String?
+  deletedBy               String?
+  syncStatus              SyncStatus       @default(PENDING)
+  syncedAt                DateTime?        @db.Timestamptz(3)
+  extraData               Json?
+  extraData1              Json?
+  extraData2              Json?
+  thirdPartyToolData      Json?
+  AssetUsageLog           AssetUsageLog[]
+  ParkingSession          ParkingSession[] @relation("ParkingAgainstReservation")
+
+  @@index([userId])
+  @@index([sessionId, sessionType])
+  @@index([meetingId])
+  @@index([reservationStartTime, reservationEndTime])
+  @@index([reservationStatus])
+}
+
+model ParkingReceipt {
+  id                 String               @id @default(cuid())
+  user               User                 @relation(name: "ParkingReceipt", fields: [userId], references: [id])
+  userId             String
+  parkingStatus      ParkingSessionStatus
+  amount             Decimal              @db.Decimal(10, 2)
+  stateTax           Decimal?             @db.Decimal(10, 2)
+  nationalTax        Decimal?             @db.Decimal(10, 2)
+  VAT                Decimal?             @db.Decimal(10, 2)
+  surcharge1         Decimal?             @db.Decimal(10, 2)
+  surcharge2         Decimal?             @db.Decimal(10, 2)
+  surcharge3         Decimal?             @db.Decimal(10, 2)
+  totalAmount        Decimal              @db.Decimal(10, 2)
+  receiptNo          String
+  receiptPrinted     Boolean              @default(false)
+  receiptGivenAs     ReceiptDeliveryMethod
+  parkingSession     ParkingSession       @relation(name: "ParkingReceipt", fields: [parkingSessionId], references: [id])
+  parkingSessionId   String
+  attendant          User                 @relation(name: "ReceiptByAttendant", fields: [attendantId], references: [id])
+  attendantId        String
+  docType            DocType              @default(PARKINGRECEIPT)
+  docStatus          DocStatus            @default(ACTIVE)
+  createdAt          DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime             @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime?            @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  syncStatus         SyncStatus           @default(PENDING)
+  syncedAt           DateTime?            @db.Timestamptz(3)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+
+  @@index([receiptNo])
+  @@index([parkingSessionId])
+  @@index([userId])
+  @@index([attendantId])
+  @@index([createdAt])
+}
+
+// ==== NEW TABLE: PlaceMetadata ====
+model PlaceMetadata {
+  id                                    String    @id @default(cuid())
+  place                                 Place     @relation(fields: [placeId], references: [id])
+  placeId                               String    @unique // Each place has one metadata record
+  baselineValetParkingAvgRetrievalTimeMinutes Int    @default(12) // Baseline/Target retrieval time in minutes (Updated Name)
+  optimizationObjective                 String    @default("Minimize retrieval time") // Current primary objective
+  validFrom                             DateTime  @default(now()) @db.Timestamptz(3) // Track when this setting became active
+  validUntil                            DateTime? @db.Timestamptz(3) // Track when this setting ended (for history)
+
+  // Standard audit fields
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  createdBy String?
+  updatedBy String?
+
+  // Document metadata
+  docType   DocType   @default(PLACEMETADATA)
+  docStatus DocStatus @default(ACTIVE)
+
+  @@index([placeId, validFrom, validUntil])
+}
+
+// ==== NEW TABLE: MechanisedParkingShuffle ====
+model MechanisedParkingShuffle {
+  id                      String      @id @default(cuid())
+  parkingSession          ParkingSession @relation(fields: [parkingSessionId], references: [id])
+  parkingSessionId        String
+  vehicle                 Vehicle     @relation(fields: [vehicleId], references: [id])
+  vehicleId               String
+  shuffleRequestTimestamp DateTime    @default(now()) @db.Timestamptz(3)
+  shuffleStartTimestamp   DateTime?   @db.Timestamptz(3)
+  shuffleEndTimestamp     DateTime?   @db.Timestamptz(3)
+  sourceSpot              ParkingSpot? @relation("ShuffleSourceSpot", fields: [sourceSpotId], references: [id])
+  sourceSpotId            String?
+  destinationSpot         ParkingSpot? @relation("ShuffleDestinationSpot", fields: [destinationSpotId], references: [id])
+  destinationSpotId       String?
+  reason                  String?
+
+  // Standard audit fields
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  createdBy String? // Could be system user or operator ID
+  updatedBy String?
+
+  // Document metadata
+  docType   DocType   @default(MECHANISHEDPARKINGSHUFFLE)
+  docStatus DocStatus @default(ACTIVE)
+
+  @@index([parkingSessionId])
+  @@index([shuffleRequestTimestamp])
+  @@index([reason])
+}
+
+// ==== NEW TABLE: QueueLengthLog ====
+model QueueLengthLog {
+  id                   String    @id @default(cuid())
+  place                Place     @relation(fields: [placeId], references: [id])
+  placeId              String
+  timestamp            DateTime  @default(now()) @db.Timestamptz(3) // Timestamp of the snapshot
+  incomingQueueLength  Int       // Calculated number of vehicles waiting to check-in/park
+  outgoingQueueLength  Int       // Calculated number of vehicles waiting for retrieval
+
+  // Standard audit fields if needed
+  createdAt            DateTime  @default(now()) @db.Timestamptz(3)
+
+  // Document metadata
+  docType   DocType   @default(QUEUELENGTHLOG)
+  docStatus DocStatus @default(ACTIVE)
+
+  @@index([placeId, timestamp])
+  @@index([timestamp])
+}
+
+
+model Place {
+  id                       String                     @id @default(cuid())
+  placeName                String
+  placeType                PlaceType
+  prefix                   String?
+  identifiedAreaId         String?
+  identifiedAreaName       String?
+  specificAreaType         SpecificAreaType?
+  supplementalFacilityType SupplementalFacilityType[]
+  address                  String?
+  pinCode                  String?
+  city                     String
+  stateOrProvince          String
+  country                  String
+  taxNumber                String?
+  baseUrl                  String                     @unique
+  latitude                 Float?
+  longitude                Float?
+  activatedModules         SpacemateModule[]
+  organizations            Organization[]
+  userPlaces               UserPlace[]
+  meetings                 Meeting[]
+  assets                   Asset[]                    @relation(name: "AssetsOfPlace")
+  rateCharts               ParkingRateChart[]
+  parkingCapacity          ParkingCapacity[]
+  PlaceOrganization        PlaceOrganization[]
+  docType                  DocType                    @default(PLACE)
+  docStatus                DocStatus                  @default(ACTIVE)
+  createdAt                DateTime                   @default(now()) @db.Timestamptz(3)
+  updatedAt                DateTime                   @updatedAt @db.Timestamptz(3)
+  deletedAt                DateTime?                  @db.Timestamptz(3)
+  createdBy                String?
+  updatedBy                String?
+  deletedBy                String?
+  syncStatus               SyncStatus                 @default(PENDING)
+  syncedAt                 DateTime?                  @db.Timestamptz(3)
+  parkingConfig            Json?
+  subPlaceConfig           Json?
+  extraData                Json?
+  extraData1               Json?
+  extraData2               Json?
+  thirdPartyToolData       Json?
+  PlaceVisits              PlaceVisits[]
+  InvoicePayment           InvoicePayment[]
+  Transaction              Transaction[]
+  Pass                     Pass[]
+  ParkingSession           ParkingSession[]
+  lanes                    Lane[]
+  devices                  Device[]
+  pmsSetting               PMSSetting[]
+  PMSWorkerSession         PMSWorkerSession[]
+  parkingSpots             ParkingSpot[]
+  priceTags                PriceTag[]
+  reportingTags            ReportingTag[]
+  marketingTags            MarketingTag[]
+
+  // ==== NEW RELATION: Link to PlaceMetadata ====
+  metadata PlaceMetadata[]
+
+  // ==== NEW RELATION: Link to QueueLengthLog ====
+  queueLogs QueueLengthLog[]
+
+  @@index([placeName])
+  @@index([placeType])
+  @@index([identifiedAreaId])
+  @@index([specificAreaType])
+  @@index([city, stateOrProvince, country])
+}
+
+model Organization {
+  id                String             @id @default(cuid())
+  orgName           String
+  type              OrganizationType
+  orgGroupId        String?
+  industry          IndustryType
+  spaces            Json?
+  place             Place              @relation(fields: [placeId], references: [id])
+  placeId           String
+  visits            Visit[]
+  userOrganizations UserOrganization[]
+  meetingsAsHost    Meeting[]          @relation(name: "Host Organization")
+  invitesAsVisitor  Invite[]           @relation(name: "Visitor Organization")
+  assets            Asset[]            @relation(name: "AssetOfOrganization")
+  devices           Device[]
+  rateCharts        ParkingRateChart[]
+  passes            Pass[]
+  parkingSpots      ParkingSpot[]
+  docType           DocType            @default(ORGANIZATION)
+  docStatus         DocStatus          @default(ACTIVE)
+  createdAt         DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?          @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  syncStatus        SyncStatus         @default(PENDING)
+  syncedAt          DateTime?          @db.Timestamptz(3)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+  parkingCapacity   ParkingCapacity[]
+  receipts          Receipt[]
+  invoices          Invoice[]
+  PlaceOrganization PlaceOrganization[]
+  AssetUsageLog     AssetUsageLog[]
+  AssetMaintenance  AssetMaintenance[] @relation(name: "MaintenanceVendor")
+  MarketingTag      MarketingTag[]
+  NotificationObject NotificationObject[]
+  SubscriberGroup   SubscriberGroup[]
+  Notification      Notification[]
+  Meeting           Meeting[]          @relation(name: "Visitor Organization")
+  pmsSetting        PMSSetting[]
+  parkingSessions   ParkingSession[]
+  PriceTag          PriceTag[]
+  ReportingTag      ReportingTag[]
+}
+
+model UserOrganization {
+  id             String         @id @default(cuid())
+  user           User           @relation(fields: [userId], references: [id])
+  userId         String
+  organization   Organization   @relation(fields: [organizationId], references: [id])
+  organizationId String
+  vmsRole        VMSROLE?
+  pmsRole        PMSROLE?
+  orgRole        ORGROLE?
+  status         PLACEORGSTATUS?
+  jobTitle       String?
+  dateOfJoining  DateTime?      @db.Timestamptz(3)
+  dateOfLeaving  DateTime?      @db.Timestamptz(3)
+  docType        DocType        @default(USERORGANIZATION)
+  docStatus      DocStatus      @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?      @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus     @default(PENDING)
+  syncedAt       DateTime?      @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+
+  @@unique([userId, organizationId])
+  @@index([vmsRole])
+}
+
+model UserPlace {
+  id        String            @id @default(cuid())
+  user      User              @relation(fields: [userId], references: [id])
+  userId    String
+  place     Place             @relation(fields: [placeId], references: [id])
+  placeId   String
+  role      PLACERELATIONSHIP
+  status    PLACEUSERSTATUS?
+  docType   DocType           @default(USERPLACE)
+  docStatus DocStatus         @default(ACTIVE)
+  createdAt DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime          @updatedAt @db.Timestamptz(3)
+  deletedAt DateTime?         @db.Timestamptz(3)
+  createdBy String?
+  updatedBy String?
+  deletedBy String?
+  syncStatus SyncStatus        @default(PENDING)
+  syncedAt  DateTime?         @db.Timestamptz(3)
+  extraData Json?
+  extraData1 Json?
+  extraData2 Json?
+  thirdPartyToolData Json?
+
+  @@unique([userId, placeId])
+  @@index([role])
+}
+
+model Visit {
+  id               String         @id @default(cuid())
+  visitor          User           @relation(name: "Visitor", fields: [visitorId], references: [id])
+  visitorId        String
+  meeting          Meeting        @relation(fields: [meetingId], references: [id])
+  meetingId        String
+  visitType        VisitType
+  visitCategory    VisitCategory?
+  isWalkin         Boolean        @default(false)
+  walkinDetails    Json?
+  organization     Organization[]
+  checkInDatetime  DateTime?      @default(now()) @db.Timestamptz(3)
+  checkOutDatetime DateTime?      @db.Timestamptz(3)
+  visitStatus      VisitStatus    @default(CHECKEDIN)
+  userHosts        User[]         @relation(name: "Host")
+  inviteCode       String?
+  docType          DocType        @default(VISIT)
+  docStatus        DocStatus      @default(ACTIVE)
+  createdAt        DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime       @updatedAt @db.Timestamptz(3)
+  deletedAt        DateTime?      @db.Timestamptz(3)
+  createdBy        String?
+  updatedBy        String?
+  deletedBy        String?
+  syncStatus       SyncStatus     @default(PENDING)
+  syncedAt         DateTime?      @db.Timestamptz(3)
+  extraData        Json?
+  extraData1       Json?
+  extraData2       Json?
+  thirdPartyToolData Json?
+  expectedDuration Int?
+  actualDuration   Int?
+  durationVariance Int?
+  visitorCategory  String?
+  visitorPriority  String?
+  isFirstVisit     Boolean        @default(false)
+  visitCount       Int            @default(0)
+  journeyPath      Json?
+
+  @@unique([inviteCode, checkInDatetime])
+  @@index([checkInDatetime, visitStatus])
+  @@index([checkInDatetime, visitorId])
+  @@index([checkInDatetime, meetingId])
+}
+
+model Asset {
+  id               String             @id @default(cuid())
+  name             String
+  type             AssetType
+  meetings         Meeting[]          @relation("RoomAsset")
+  descJson         Json?
+  organization     Organization?      @relation(name: "AssetOfOrganization", fields: [organizationId], references: [id])
+  organizationId   String?
+  place            Place?             @relation(name: "AssetsOfPlace", fields: [placeId], references: [id])
+  placeId          String?
+  lane             Lane?              @relation(name: "AssetOfLane", fields: [laneId], references: [id])
+  laneId           String?
+  user             User?              @relation(name: "AssetsOfUser", fields: [userId], references: [id])
+  userId           String?
+  docType          DocType            @default(ASSET)
+  docStatus        DocStatus          @default(ACTIVE)
+  createdAt        DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt        DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt        DateTime?          @db.Timestamptz(3)
+  createdBy        String?
+  updatedBy        String?
+  deletedBy        String?
+  syncStatus       SyncStatus         @default(PENDING)
+  syncedAt         DateTime?          @db.Timestamptz(3)
+  extraData        Json?
+  extraData1       Json?
+  extraData2       Json?
+  thirdPartyToolData Json?
+  assetStatus      Json?
+  assetMaintenances AssetMaintenance[]
+  assetUsageLogs    AssetUsageLog[]
+  reservations      Reservation[]
+  ParkingSession    ParkingSession[]
+  parentAsset       Asset?             @relation("AssetHierarchy", fields: [parentAssetId], references: [id])
+  parentAssetId     String?
+  childAssets       Asset[]            @relation("AssetHierarchy")
+  relationType      AssetRelationType  @default(INDEPENDENT)
+  hierarchyType     AssetHierarchyType?
+  hierarchyLevel    Int                @default(0)
+  sortOrder         Int                @default(0)
+  configuration     Json?
+  status            String
+  operationalConfig Json?
+
+  @@index([type, status])
+  @@index([parentAssetId])
+  @@index([hierarchyLevel])
+  @@index([type, hierarchyType])
+}
+
+model Notification {
+  id                   String             @id @default(cuid())
+  subscriber           User               @relation("Subscriber", fields: [subscriberId], references: [id])
+  subscriberId         String
+  publisher            User               @relation("Publisher", fields: [publisherId], references: [id])
+  publisherId          String
+  content              String             @db.Text
+  title                String
+  channel              NotificationChannel
+  provider             NotificationProvider? @relation(fields: [providerId], references: [id])
+  providerId           String?
+  status               NotificationStatus @default(PENDING)
+  triggerEvent         String
+  workflowId           String?
+  feedId               String?
+  organization         Organization       @relation(fields: [orgId], references: [id])
+  orgId                String
+  tenantId             String?
+  subscriberGroup      SubscriberGroup?   @relation(fields: [subscriberGroupId], references: [id])
+  subscriberGroupId    String?
+  notificationObject   NotificationObject? @relation(fields: [notificationObjectId], references: [id])
+  notificationObjectId String?
+  docType              DocType            @default(NOTIFICATION)
+  docStatus            DocStatus          @default(ACTIVE)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?          @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus         @default(PENDING)
+  syncedAt             DateTime?          @db.Timestamptz(3)
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  message              Message?
+  messageId            String?            @unique
+  user                 User               @relation(fields: [userId], references: [id])
+  userId               String
+  placeId              String
+  topic                Topic?             @relation(fields: [topicId], references: [id])
+  topicId              String?
+  deliveryType         NotificationDeliveryType
+  idempotencyKey       String             @unique
+  metadata             Json?
+
+  @@index([subscriberId])
+  @@index([publisherId])
+  @@index([channel])
+  @@index([status])
+  @@index([workflowId])
+  @@index([orgId])
+  @@index([subscriberGroupId])
+  @@index([notificationObjectId])
+  @@index([userId])
+  @@index([placeId])
+  @@index([topicId])
+}
+
+model NotificationProvider {
+  id             String         @id @default(cuid())
+  name           String
+  type           String
+  accessToken    String?
+  refreshToken   String?
+  apiKey         String?
+  apiSecret      String?
+  creditsBalance Int?
+  creditsUsed    Int            @default(0)
+  isActive       Boolean        @default(true)
+  configurations Json?
+  notifications  Notification[]
+  docType        DocType        @default(NOTIFICATIONPROVIDER)
+  docStatus      DocStatus      @default(ACTIVE)
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?      @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus     @default(PENDING)
+  syncedAt       DateTime?      @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+}
+
+model SubscriberGroup {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  rules         Json?
+  subscribers   Json?
+  isActive      Boolean        @default(true)
+  notifications Notification[]
+  organization  Organization   @relation(fields: [orgId], references: [id])
+  orgId         String
+  docType       DocType        @default(SUBSCRIBERGROUP)
+  docStatus     DocStatus      @default(ACTIVE)
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
+  deletedAt     DateTime?      @db.Timestamptz(3)
+  createdBy     String?
+  updatedBy     String?
+  deletedBy     String?
+  syncStatus    SyncStatus     @default(PENDING)
+  syncedAt      DateTime?      @db.Timestamptz(3)
+  extraData     Json?
+  extraData1    Json?
+  extraData2    Json?
+  thirdPartyToolData Json?
+}
+
+model NotificationObject {
+  id            String               @id @default(cuid())
+  objectType    String
+  objectId      String
+  objectData    Json
+  changes       NotificationChange[]
+  useCase       String
+  state         NotificationObjectState
+  retryCount    Int                  @default(0)
+  messages      Message[]
+  notifications Notification[]
+  organization  Organization         @relation(fields: [orgId], references: [id])
+  orgId         String
+  docType       DocType              @default(NOTIFICATIONOBJECT)
+  docStatus     DocStatus            @default(ACTIVE)
+  createdAt     DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime             @updatedAt @db.Timestamptz(3)
+  deletedAt     DateTime?            @db.Timestamptz(3)
+  createdBy     String?
+  updatedBy     String?
+  deletedBy     String?
+  syncStatus    SyncStatus           @default(PENDING)
+  syncedAt      DateTime?            @db.Timestamptz(3)
+  extraData     Json?
+  extraData1    Json?
+  extraData2    Json?
+  thirdPartyToolData Json?
+
+  @@unique([objectType, objectId, orgId])
+}
+
+model NotificationChange {
+  id                   String              @id @default(cuid())
+  notificationObject   NotificationObject  @relation(fields: [notificationObjectId], references: [id])
+  notificationObjectId String
+  changeType           NotificationChangeType
+  changedFields        Json?
+  oldValues            Json?
+  newValues            Json?
+  timestamp            DateTime            @default(now()) @db.Timestamptz(3)
+  status               NotificationStatus?
+  docType              DocType             @default(NOTIFICATIONCHANGE)
+  docStatus            DocStatus           @default(ACTIVE)
+  changedAt            DateTime            @default(now())
+  userId               Int?
+  changeData           Json?
+  createdAt            DateTime            @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime            @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?           @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus          @default(PENDING)
+  syncedAt             DateTime?           @db.Timestamptz(3)
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  changeCategory       String?
+  changeImpact         String?
+  isAutomated          Boolean             @default(false)
+  previousState        Json?
+  changeDuration       Int?
+  changeSource         String?
+  changeMetrics        Json?
+  notificationFlow     String?
+
+  @@index([notificationObjectId])
+  @@index([userId])
+  @@index([notificationObjectId, changeType])
+  @@index([timestamp, notificationObjectId])
+  @@index([timestamp, changeType])
+  @@index([timestamp, status])
+  @@index([timestamp, changeType, status])
+}
+
+model ParkingSpot {
+  id                   String             @id @default(cuid())
+  spotNumber           String             @unique
+  vehicleType          VehicleType
+  spotType             SpotType
+  floorOrLevel         String?
+  zone                 String?
+  pillarOrColumn       String?
+  zoneType             ZoneType
+  isEV                 Boolean            @default(false)
+  hasParkingLock       Boolean            @default(false)
+  isOversize           Boolean            @default(false)
+  externalIdentifier   String             @unique
+  chargingType         ChargingType       @default(NA)
+  retrievalTimeSeconds Int?
+  accessibilityRating  Float?
+  coverType            CoverType          @default(OPEN)
+  isDedicatedSpot      Boolean            @default(false)
+  priorityLevel        Int                @default(0)
+  priorityRate         Decimal?           @db.Decimal(10, 2)
+  specialRestriction   SpecialRestriction @default(NONE)
+  palletDetails        Json?
+  operationalStatus    String?
+  maintenanceHistory   Json?
+  dimensions           Json?
+  usageStats           Json?
+  proximityFeatures    Json?
+  detectionSystem      String?
+  sensorStatus         String?
+  lastMaintenance      DateTime?          @db.Timestamptz(3)
+  status               ParkingStatus      @default(AVAILABLE)
+  reservationStatus    ReservationStatus?
+  reservationStartDate DateTime?          @db.Timestamptz(3)
+  reservationEndDate   DateTime?          @db.Timestamptz(3)
+  reservationId        String?
+  namedArea            String?
+  externalId           String?
+  areaType             String?
+  length               Float?
+  width                Float?
+  height               Float?
+  dimensionUnit        DimensionUnit?
+  area                 Float?
+  weight               Float?
+  pointLocation        Json?
+  areaLocation         Json?
+  gmlMultiPolygon      Json?
+  operatingRestriction OperatingRestriction?
+  detection            Json?
+  organization         Organization?      @relation(fields: [organizationId], references: [id])
+  organizationId       String?
+  rateChart            ParkingRateChart?  @relation(fields: [rateChartId], references: [id])
+  rateChartId          String?
+  place                Place?             @relation(fields: [placeId], references: [id])
+  placeId              String?
+  parkingSessions      ParkingSession[]
+  observations         PMSObservation[]
+  docType              DocType            @default(PARKINGSPOT)
+  docStatus            DocStatus          @default(ACTIVE)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?          @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus         @default(PENDING)
+  syncedAt             DateTime?          @db.Timestamptz(3)
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  ParkedVehicles       ParkedVehicles[]
+  isValetZone          Boolean            @default(false)
+  valetAccessRating    Int?
+  relocationType       String?
+  spotInstructions     String?
+
+  // ==== NEW RELATIONS: Link to MechanisedParkingShuffle ====
+  shufflesFromHere MechanisedParkingShuffle[] @relation("ShuffleSourceSpot")
+  shufflesToHere   MechanisedParkingShuffle[] @relation("ShuffleDestinationSpot")
+
+  @@index([vehicleType])
+  @@index([spotType])
+  @@index([zoneType])
+  @@index([status])
+  @@index([reservationStatus])
+  @@index([floorOrLevel, zone])
+  @@index([chargingType, status])
+  @@index([accessibilityRating, status])
+  @@index([retrievalTimeSeconds, status])
+  @@index([operationalStatus, spotType])
+  @@index([chargingType, vehicleType, status])
+  @@index([priorityLevel, status])
+}
+
+model ParkingSession {
+  id                    String                 @id @default(cuid())
+  vehicle               Vehicle?               @relation(fields: [vehicleId], references: [id])
+  vehicleId             String?
+  vehicleNumber         String
+  vehicleType           VehicleType            @default(FOUR_WHEELER)
+  visitor               User?                  @relation(name: "VisitorParking", fields: [visitorId], references: [id])
+  visitorId             String?
+  employee              User?                  @relation(name: "EmployeeParking", fields: [employeeId], references: [id])
+  employeeId            String?
+  reportingTag          ReportingTag?          @relation(name: "entryReportingTag", fields: [reportingTagId], references: [id])
+  reportingTagId        String?
+  priceTag              PriceTag?              @relation(name: "entryPriceTag", fields: [priceTagId], references: [id])
+  priceTagId            String?
+  marketingTag          MarketingTag?          @relation(name: "entryMarketingTag", fields: [marketingTagId], references: [id])
+  marketingTagId        String?
+  organization          Organization?          @relation(fields: [organizationId], references: [id])
+  organizationId        String?
+  parkingSpot           ParkingSpot?           @relation(fields: [parkingSpotId], references: [id])
+  parkingSpotId         String?
+  entryLane             Lane?                  @relation(name: "EntryLane", fields: [entryLaneId], references: [id])
+  entryLaneId           String?
+  exitLane              Lane?                  @relation(name: "ExitLane", fields: [exitLaneId], references: [id])
+  exitLaneId            String?
+  status                ParkingSessionStatus   @default(IN)
+  place                 Place                  @relation(fields: [placeId], references: [id])
+  placeId               String
+  placeName             String?
+  isValetParking        Boolean                @default(false)
+  valetStatus           ValetStatus?
+  keyStorageType        KeyStorageType?
+  keyDetails            Json?
+  durationMinutes       Int?
+  retrievalDuration     Int?
+  waitTime              Int?
+  shiftId               String?
+  isFirstVisit          Boolean                @default(false)
+  baseAmount            Decimal?               @default(0) @db.Decimal(10, 2)
+  priorityAmount        Decimal?               @db.Decimal(10, 2)
+  appliedRateId         String?
+  validationStatus      String?
+  validationNotes       String?
+  businessDate          DateTime?              @db.Timestamptz(3)
+  entryBusinessDate     DateTime?              @db.Timestamptz(3)
+  exitBusinessDate      DateTime?              @db.Timestamptz(3)
+  valetHandoverDetails  Json?
+  keyStatus             KeyStatus?
+  assignedDriver        User?                  @relation("ValetDriver", fields: [assignedDriverId], references: [id])
+  assignedDriverId      String?
+  lastNotificationSent  DateTime?              @db.Timestamptz(3)
+  notificationHistory   Json?
+  retrievalRequestTime  DateTime?              @db.Timestamptz(3) // Used for KPI
+  estimatedReadyTime    DateTime?              @db.Timestamptz(3)
+  actualReadyTime       DateTime?              @db.Timestamptz(3) // Used for KPI
+  pass                  Pass?                  @relation(fields: [passId], references: [id])
+  passId                String?
+  parkingActivationMode ParkingActivationMode? @default(APP)
+  parkerTypes           ParkerType[]
+  checkinDatetime       DateTime               @default(now()) @db.Timestamptz(3)
+  checkoutDatetime      DateTime?              @db.Timestamptz(3)
+  enteredBy             User                   @relation(name: "EntryAttendant", fields: [enteredById], references: [id])
+  enteredById           String
+  enteredByName         String?
+  exitedBy              User?                  @relation(name: "ExitAttendant", fields: [exitedById], references: [id])
+  exitedById            String?
+  exitedByName          String?
+  isForcedOut           Boolean                @default(false)
+  rateChart             ParkingRateChart?      @relation(fields: [rateChartId], references: [id])
+  rateChartId           String?
+  entryAmount           Decimal?               @db.Decimal(10, 2)
+  exitAmount            Decimal?               @db.Decimal(10, 2)
+  totalAmount           Decimal?               @db.Decimal(10, 2)
+  paymentMethod         PaymentMethod?
+  paymentStatus         PaymentStatus          @default(PENDING)
+  entryTransaction      Transaction?           @relation(name: "EntryTransaction", fields: [entryTransactionId], references: [id])
+  entryTransactionId    String?
+  exitTransaction       Transaction?           @relation(name: "ExitTransaction", fields: [exitTransactionId], references: [id])
+  exitTransactionId     String?
+  entryWorkerSession    PMSWorkerSession?      @relation(name: "EntryWorkerSession", fields: [entryWorkerSessionId], references: [id])
+  entryWorkerSessionId  String?
+  exitWorkerSession     PMSWorkerSession?      @relation(name: "ExitWorkerSession", fields: [exitWorkerSessionId], references: [id])
+  exitWorkerSessionId   String?
+  invoiceNumber         String?
+  feedback              String?
+  rating                Int?                   @default(0)
+  entryPhotoUrl         String?
+  exitPhotoUrl          String?
+  entryPhotoMedia       Media?                 @relation(name: "entryPhoto", fields: [entryPhotoMediaId], references: [id])
+  entryPhotoMediaId     String?
+  exitPhotoMedia        Media?                 @relation(name: "exitPhoto", fields: [exitPhotoMediaId], references: [id])
+  exitPhotoMediaId      String?
+  reservation           Reservation[]          @relation("ParkingAgainstReservation")
+  parkingReceipts       ParkingReceipt[]       @relation("ParkingReceipt")
+  docType               DocType                @default(PARKINGSESSION)
+  docStatus             DocStatus              @default(ACTIVE)
+  createdAt             DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt             DateTime               @updatedAt @db.Timestamptz(3)
+  deletedAt             DateTime?              @db.Timestamptz(3)
+  createdBy             String?
+  updatedBy             String?
+  deletedBy             String?
+  syncStatus            SyncStatus             @default(PENDING)
+  syncedAt              DateTime?              @db.Timestamptz(3)
+  extraData             Json?                  // Allocation driver stored here, e.g., extraData ->> 'parkingSpotAllocationReason'
+  extraData1            Json?
+  extraData2            Json?
+  thirdPartyToolData    Json?
+  entryValidation       Json?
+  exitValidation        Json?
+  systemSource          String?
+  vehicleCondition      VehicleCondition[]
+  keyHook               Asset?                 @relation(fields: [assetId], references: [id])
+  valetRequests         ValetRequest[]
+  handoverDetails       Json?
+  customerNotified      Boolean                @default(false)
+  lastNotification      DateTime?              @db.Timestamptz(3)
+  requestedAt           DateTime?              @db.Timestamptz(3)
+  assetId               String?
+  ticketNumber          String?
+  receiptNumber         String?
+  retrievalOtp          String?
+
+  // ==== NEW RELATION: Link to MechanisedParkingShuffle ====
+  shuffles MechanisedParkingShuffle[]
+
+  @@unique([invoiceNumber, checkinDatetime])
+  @@index([vehicleNumber])
+  @@index([status])
+  @@index([checkinDatetime, checkoutDatetime])
+  @@index([parkingSpotId])
+  @@index([entryLaneId])
+  @@index([exitLaneId])
+  @@index([paymentStatus])
+  @@index([parkingActivationMode])
+  @@index([checkinDatetime, vehicleNumber])
+  @@index([checkinDatetime, status])
+  @@index([checkinDatetime, parkingSpotId])
+  @@index([checkinDatetime, enteredById])
+  @@index([checkinDatetime, paymentMethod])
+  @@index([valetStatus, status])
+  @@index([assignedDriverId, status])
+  @@index([retrievalRequestTime])
+  @@index([systemSource, status])
+  @@index([createdAt, systemSource])
+}
+
+
+model Pass {
+  id                         String             @id @default(cuid())
+  passDuration               PassDuration
+  passType                   PassType
+  status                     PassStatus         @default(ACTIVE)
+  place                      Place?             @relation(fields: [placeId], references: [id])
+  placeId                    String?
+  placeName                  String?
+  validFrom                  DateTime           @db.Timestamptz(3)
+  validUntil                 DateTime?          @db.Timestamptz(3)
+  renewalDate                DateTime?          @db.Timestamptz(3)
+  renewalAdvanceNoticeInDays Int                @default(0)
+  gracePeriod                Int?
+  customerSinceDate          DateTime?          @db.Timestamptz(3)
+  passRestriction            PassRestriction?
+  passPrivilege              PassPrivilege?
+  passOwnerType              PassOwnerType      @default(INDIVIDUAL)
+  organization               Organization?      @relation(fields: [organizationId], references: [id])
+  organizationId             String?
+  tenantId                   String?
+  groupId                    String?
+  planId                     String?
+  vehicle                    Vehicle?           @relation(fields: [vehicleId], references: [id])
+  vehicleId                  String?
+  vehicleManagedBy           VehicleManagement  @default(INDIVIDUAL)
+  vehicleNumber              String
+  vehicleType                VehicleType        @default(FOUR_WHEELER)
+  rfidTag                    String?
+  parkerTypes                ParkerType[]
+  passAmount                 Decimal            @db.Decimal(10, 2)
+  paymentMethod              PaymentMethod?
+  paymentStatus              PaymentStatus      @default(PENDING)
+  invoiceId                  String?
+  isExistingCustomer         Boolean?           @default(false)
+  numberOfRenewals           Int?               @default(0)
+  totalPassPayments          Decimal?           @default(0) @db.Decimal(10, 2)
+  user                       User?              @relation(fields: [userId], references: [id])
+  userId                     String?
+  parkingSessions            ParkingSession[]
+  docType                    DocType            @default(PASS)
+  docStatus                  DocStatus          @default(ACTIVE)
+  createdAt                  DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt                  DateTime?          @db.Timestamptz(3)
+  createdByUser              User?              @relation(name: "passCreatedBy", fields: [createdBy], references: [id])
+  createdBy                  String?
+  updatedBy                  String?
+  deletedBy                  String?
+  syncStatus                 SyncStatus         @default(PENDING)
+  syncedAt                   DateTime?          @db.Timestamptz(3)
+  extraData                  Json?
+  extraData1                 Json?
+  extraData2                 Json?
+  thirdPartyToolData         Json?
+  ParkedVehicles             ParkedVehicles[]
+
+  @@index([vehicleNumber])
+  @@index([rfidTag])
+  @@index([status])
+  @@index([validFrom, validUntil])
+  @@index([renewalDate])
+  @@index([passType])
+  @@index([placeId])
+  @@index([organizationId])
+}
+
+model ParkingRateChart {
+  id                  String                   @id @default(cuid())
+  rateType            RateType                 @default(HOURLY)
+  baseAmount          Decimal                  @db.Decimal(10, 2)
+  calculationSequence PriceCalculationSequence @default(MODIFIER_FIRST)
+  organization        Organization?            @relation(fields: [organizationId], references: [id])
+  organizationId      String?
+  place               Place?                   @relation(fields: [placeId], references: [id])
+  placeId             String
+  spaceType           SpaceType                @default(STANDARD)
+  timeSlots           Json?
+  dayType             String[]
+  validFrom           DateTime                 @db.Timestamptz(3)
+  validUntil          DateTime?                @db.Timestamptz(3)
+  vehicleType         VehicleType
+  minimumDuration     Int?
+  maximumDuration     Int?
+  earlyBirdRate       Decimal?                 @db.Decimal(10, 2)
+  overrideFlatPricing Boolean?                 @default(false)
+  applicableFromTime  String?
+  applicableFromNextDay Boolean?               @default(false)
+  priceRules          Json?
+  parkingSessions     ParkingSession[]
+  parkingSpots        ParkingSpot[]
+  docType             DocType                  @default(RATECHART)
+  docStatus           DocStatus                @default(ACTIVE)
+  createdAt           DateTime                 @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime                 @updatedAt @db.Timestamptz(3)
+  deletedAt           DateTime?                @db.Timestamptz(3)
+  createdBy           String?
+  updatedBy           String?
+  deletedBy           String?
+  syncStatus          SyncStatus               @default(PENDING)
+  syncedAt            DateTime?                @db.Timestamptz(3)
+  extraData           Json?
+  extraData1          Json?
+  extraData2          Json?
+  thirdPartyToolData  Json?
+  ParkedVehicles      ParkedVehicles[]
+
+  @@index([rateType])
+  @@index([spaceType])
+  @@index([validFrom, validUntil])
+  @@index([organizationId])
+}
+
+
+model VMSObservation {
+  id                   String             @id @default(cuid())
+  userId               String
+  visitId              String?
+  observationType      VMSObservationType
+  confidence           Float?
+  locationId           String
+  locationType         LocationType
+  checkpointName       String?
+  observedAt           DateTime           @default(now()) @db.Timestamptz(3)
+  device               Device?            @relation(fields: [deviceId], references: [id])
+  deviceId             String?
+  isSuccessful         Boolean            @default(true)
+  failureReason        String?
+  previousCheckpointId String?
+  nextCheckpointId     String?
+  waitTimeSeconds      Int?
+  docType              DocType            @default(VMSOBSERVATION)
+  docStatus            DocStatus          @default(ACTIVE)
+  createdAt            DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?          @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus         @default(PENDING)
+  syncedAt             DateTime?          @db.Timestamptz(3)
+  observationData      Json?
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  pathSegment          String?
+  sequenceNumber       Int?
+  zoneTransition       String?
+  processingDelay      Int?
+  queueTime            Int?
+  dwellTime            Int?
+
+  @@index([userId, observedAt])
+  @@index([visitId, observedAt])
+  @@index([locationId, observedAt])
+  @@index([observedAt, observationType])
+  @@index([observedAt, locationId])
+  @@index([observedAt, userId])
+  @@index([observedAt, deviceId])
+  @@index([observedAt, deviceId, observationType])
+}
+
+model PMSObservation {
+  id                String             @id @default(cuid())
+  vehicleNumber     String
+  vehicle           Vehicle?           @relation(fields: [vehicleId], references: [id])
+  vehicleId         String?
+  device            Device?            @relation(fields: [deviceId], references: [id])
+  deviceId          String?
+  observationType   PMSObservationType
+  observationSource PMSObservationSource
+  tagId             String?
+  checkpoint        String?
+  detectionUserId   String?
+  detectionUserName String?
+  detectionOrgName  String?
+  parkingSpot       ParkingSpot?       @relation(fields: [parkingSpotId], references: [id])
+  parkingSpotId     String?
+  readerConfidence  Float?
+  anprConfidence    Float?
+  readerType        String?
+  rawReaderData     Json?
+  confidenceScore   Decimal?           @db.Decimal(5, 2)
+  isValidated       Boolean            @default(false)
+  validationMethod  String?
+  docType           DocType            @default(PMSOBSERVATION)
+  docStatus         DocStatus          @default(ACTIVE)
+  createdAt         DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?          @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  syncStatus        SyncStatus         @default(PENDING)
+  syncedAt          DateTime?          @db.Timestamptz(3)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+  qualityMetric     String?
+  processingTime    Int?
+  deviceHealth      String?
+  signalStrength    Int?
+  validationNotes   String?
+  confidenceMetrics Decimal?           @db.Decimal(5, 2)
+
+  @@index([vehicleNumber])
+  @@index([tagId])
+  @@index([observationType])
+  @@index([observationSource])
+  @@index([checkpoint])
+  @@index([detectionUserId])
+  @@index([createdAt])
+  @@index([createdAt, parkingSpotId])
+  @@index([createdAt, observationType])
+  @@index([createdAt, observationSource])
+  @@index([createdAt, vehicleNumber])
+  @@index([createdAt, checkpoint])
+}
+
+model Device {
+  id              String           @id @default(cuid())
+  deviceName      String
+  deviceType      DeviceType
+  organization    Organization?    @relation(fields: [organizationId], references: [id])
+  organizationId  String?
+  description     String?
+  pmsObservations PMSObservation[]
+  vehicleType     VehicleType?
+  place           Place?           @relation(fields: [placeId], references: [id])
+  placeId         String?
+  lane            Lane?            @relation(fields: [laneId], references: [id])
+  laneId          String?
+  mqttTopic       String?
+  ipAddress       String?
+  macAddress      String?
+  serialNumber    String?
+  ipPort          Int?
+  docType         DocType          @default(DEVICE)
+  docStatus       DocStatus        @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt       DateTime?        @db.Timestamptz(3)
+  createdBy       String?
+  updatedBy       String?
+  deletedBy       String?
+  syncStatus      SyncStatus       @default(PENDING)
+  syncedAt        DateTime?        @db.Timestamptz(3)
+  extraData       Json?
+  extraData1      Json?
+  extraData2      Json?
+  thirdPartyToolData Json?
+  VMSObservation  VMSObservation[]
+}
+
+model Vehicle {
+  id                   String           @id @default(cuid())
+  regnNumber           String           @unique
+  regnType             RegistrationType? @default(BOOK)
+  dateOfRegn           DateTime?        @db.Timestamptz(3)
+  regnValidTill        DateTime?        @db.Timestamptz(3)
+  engineNumber         String?          @unique
+  chassisNumber        String?          @unique
+  ownerFirstName       String?
+  ownerLastName        String?
+  ownerParentFirstName String?
+  ownerParentLastName  String?
+  ownerPhoneNumber     String?
+  ownerAddress         String?
+  length               Float?
+  width                Float?
+  height               Float?
+  weight               Float?
+  preferredSpots       String[]
+  parkingHistory       Json?
+  chargingPreference   ChargingType?
+  batteryType          String?
+  chargingPortType     String?
+  vehicleType          VehicleType      @default(FOUR_WHEELER)
+  manufacturer         String?
+  model                String?
+  color                String?
+  manufacturingDate    DateTime?        @db.Timestamptz(3)
+  engineCapacity       Int?
+  bodyType             String?
+  numberOfSeats        Int?
+  numberOfAxles        Int?
+  numberOfCylinders    Int?
+  horsePower           Float?
+  wheelBase            Float?
+  prefSpotType         SpotType?
+  isOversize           Boolean?
+  fastTagId            String?          @unique
+  vehicleTag           String?
+  energySource         EnergySource?    @default(UNKNOWN)
+  owner                User?            @relation(fields: [ownerId], references: [id])
+  ownerId              String?
+  parkingSessions      ParkingSession[]
+  observations         PMSObservation[]
+  docType              DocType          @default(VEHICLE)
+  docStatus            DocStatus        @default(ACTIVE)
+  createdAt            DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?        @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus       @default(PENDING)
+  syncedAt             DateTime?        @db.Timestamptz(3)
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  ParkedVehicles       ParkedVehicles[]
+  pass                 Pass[]
+
+  // ==== NEW RELATION: Link to MechanisedParkingShuffle ====
+  shuffles MechanisedParkingShuffle[]
+
+  @@index([regnNumber])
+  @@index([engineNumber])
+  @@index([chassisNumber])
+  @@index([fastTagId])
+  @@index([vehicleType])
+  @@index([manufacturingDate])
+}
+
+
+model ParkingCapacity {
+  id                  String        @id @default(cuid())
+  organization        Organization? @relation(fields: [organizationId], references: [id])
+  organizationId      String?
+  place               Place?        @relation(fields: [placeId], references: [id])
+  placeId             String
+  placeName           String
+  total2WCapacity     Int?          @default(0)
+  total4WCapacity     Int?          @default(0)
+  totalBusCapacity    Int?          @default(0)
+  totalTruckCapacity  Int?          @default(0)
+  totalEVCapacity     Int?          @default(0)
+  total2WAvailable    Int?          @default(0)
+  total4WAvailable    Int?          @default(0)
+  totalBusAvailable   Int?          @default(0)
+  totalTruckAvailable Int?          @default(0)
+  totalEVAvailable    Int?          @default(0)
+  docType             DocType       @default(PARKINGCAPACITY)
+  docStatus           DocStatus     @default(ACTIVE)
+  createdAt           DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime      @updatedAt @db.Timestamptz(3)
+  deletedAt           DateTime?     @db.Timestamptz(3)
+  syncStatus          SyncStatus    @default(PENDING)
+  syncedAt            DateTime?     @db.Timestamptz(3)
+  extraData           Json?
+  extraData1          Json?
+  extraData2          Json?
+  thirdPartyToolData  Json?
+
+  @@index([placeId])
+  @@index([organizationId])
+  @@index([placeName])
+  @@index([createdAt, placeId])
+  @@index([createdAt, organizationId])
+}
+
+model Session {
+  id                 String      @id @default(cuid())
+  moduleSessionId    String
+  user               User        @relation(fields: [userId], references: [id])
+  userId             String
+  sessionType        SessionType
+  isFirstSession     Boolean     @default(false)
+  referrerType       ReferrerType?
+  referrerId         String?
+  analyticsSessionId String?
+  cdpSessionId       String?
+  cdpProfileId       String?
+  docType            DocType     @default(SESSION)
+  docStatus          DocStatus   @default(ACTIVE)
+  createdAt          DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime    @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime?   @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  syncStatus         SyncStatus  @default(PENDING)
+  syncedAt           DateTime?   @db.Timestamptz(3)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+
+  @@unique([userId, moduleSessionId, sessionType])
+  @@index([userId])
+  @@index([moduleSessionId, sessionType])
+  @@index([isFirstSession])
+  @@index([referrerType])
+  @@index([analyticsSessionId])
+  @@index([cdpSessionId])
+}
+
+model Media {
+  id                 String         @id @default(cuid())
+  entityId           String?
+  entityType         DocType?
+  entityMediaField   MediaFieldType
+  mediaType          MediaType
+  originalFileName   String
+  mediaFileName      String
+  mediaUrl           String
+  mediaSize          Int
+  mediaFileExtension String
+  mediaFileMime      String
+  mediaFileHash      String
+  startDate          DateTime?      @db.Timestamptz()
+  endDate            DateTime?      @db.Timestamptz()
+  docType            DocType        @default(MEDIA)
+  docStatus          DocStatus      @default(ACTIVE)
+  createdAt          DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime       @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime?      @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  syncStatus         SyncStatus     @default(PENDING)
+  syncedAt           DateTime?      @db.Timestamptz(3)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+  usersPhoto         User[]         @relation(name: "userPhoto")
+  usersGovId         User[]         @relation(name: "userGovId")
+  EntryParkingSession ParkingSession[] @relation(name: "entryPhoto")
+  ExitParkingSession ParkingSession[] @relation(name: "exitPhoto")
+  ticketTemplate     PMSSetting[]   @relation(name: "ticketTemplate")
+  passTemplate       PMSSetting[]   @relation(name: "passTemplate")
+  receiptTemplate    PMSSetting[]   @relation(name: "receiptTemplate")
+}
+
+model PlaceOrganization {
+  id             String       @id @default(cuid())
+  place          Place        @relation(fields: [placeId], references: [id])
+  placeId        String
+  organization   Organization @relation(fields: [orgId], references: [id])
+  orgId          String
+  docType        DocType      @default(PLACEORGANIZATION)
+  docStatus      DocStatus    @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?    @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus   @default(PENDING)
+  syncedAt       DateTime?    @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+}
+
+model ReportingTag {
+  id             String           @id @default(cuid())
+  tagCode        String
+  tagShortName   String
+  tagName        String
+  tagDescription String
+  affectsCounter Boolean          @default(false)
+  numberOfClicks Int              @default(0)
+  organization   Organization?    @relation(fields: [orgId], references: [id])
+  orgId          String?
+  place          Place?           @relation(fields: [placeId], references: [id])
+  placeId        String?
+  docType        DocType          @default(REPORTINGTAG)
+  docStatus      DocStatus        @default(ACTIVE)
+  createdAt      DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?        @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus       @default(PENDING)
+  syncedAt       DateTime?        @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+  parkingSessions ParkingSession[] @relation(name: "entryReportingTag")
+
+  @@index([tagCode])
+  @@index([tagShortName])
+  @@index([tagName])
+  @@index([numberOfClicks])
+}
+
+model MarketingEnrolments {
+  id             String       @id @default(cuid())
+  marketingTag   MarketingTag @relation(fields: [marketingTagId], references: [id])
+  marketingTagId String
+  user           User         @relation(fields: [userId], references: [id])
+  userId         String
+  campaignId     String?
+  docType        DocType      @default(MARKETINGENROLMENT)
+  docStatus      DocStatus    @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?    @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus   @default(PENDING)
+  syncedAt       DateTime?    @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+
+  @@unique([userId, marketingTagId, campaignId])
+  @@index([marketingTagId])
+  @@index([userId])
+  @@index([campaignId])
+  @@index([createdAt])
+}
+
+model MarketingTag {
+  id                  String                @id @default(cuid())
+  tagCode             String
+  tagShortName        String
+  tagName             String
+  tagDescription      String
+  numberOfClicks      Int                   @default(0)
+  organization        Organization?         @relation(fields: [orgId], references: [id])
+  orgId               String?
+  place               Place?                @relation(fields: [placeId], references: [id])
+  placeId             String?
+  discountType        DiscountType
+  discountValue       Decimal               @db.Decimal(10, 2)
+  tagCriteria         Json?
+  campaignId          String?
+  campaignPrize       Json?
+  raffleId            String?
+  rafflePrize         Json?
+  referrer            User?                 @relation(fields: [referrerId], references: [id])
+  referrerId          String?
+  validFrom           DateTime?             @db.Timestamptz(3)
+  validTill           DateTime?             @db.Timestamptz(3)
+  docType             DocType               @default(MARKETINGTAG)
+  docStatus           DocStatus             @default(ACTIVE)
+  createdAt           DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime              @updatedAt @db.Timestamptz(3)
+  deletedAt           DateTime?             @db.Timestamptz(3)
+  createdBy           String?
+  updatedBy           String?
+  deletedBy           String?
+  syncStatus          SyncStatus            @default(PENDING)
+  syncedAt            DateTime?             @db.Timestamptz(3)
+  extraData           Json?
+  extraData1          Json?
+  extraData2          Json?
+  thirdPartyToolData  Json?
+  MarketingEnrolments MarketingEnrolments[]
+  parkingSessions     ParkingSession[]      @relation(name: "entryMarketingTag")
+
+  @@index([tagCode])
+  @@index([tagShortName])
+  @@index([numberOfClicks])
+  @@index([campaignId])
+  @@index([raffleId])
+  @@index([referrerId])
+  @@index([orgId])
+  @@index([validFrom, validTill])
+}
+
+
+model Invoice {
+  id              String           @id @default(cuid())
+  invoiceNumber   String           @unique
+  invoiceDate     DateTime         @db.Timestamptz(3)
+  dueDate         DateTime         @db.Timestamptz(3)
+  orderId         String?
+  amount          Decimal          @db.Decimal(10, 2)
+  stateTax        Decimal?         @db.Decimal(10, 2)
+  nationalTax     Decimal?         @db.Decimal(10, 2)
+  VAT             Decimal?         @db.Decimal(10, 2)
+  surcharge1      Decimal?         @db.Decimal(10, 2)
+  surcharge2      Decimal?         @db.Decimal(10, 2)
+  surcharge3      Decimal?         @db.Decimal(10, 2)
+  discount1       Decimal?         @db.Decimal(10, 2)
+  discount2       Decimal?         @db.Decimal(10, 2)
+  discount3       Decimal?         @db.Decimal(10, 2)
+  interest        Decimal?         @db.Decimal(10, 2)
+  totalAmount     Decimal          @db.Decimal(10, 2)
+  itemCount       Int              @default(0)
+  status          PaymentStatus    @default(PENDING)
+  currency        String           @default("INR")
+  billingAddress  String?
+  shippingAddress String?
+  paymentMethod   PaymentMethod?
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  organizationId  String
+  user            User             @relation(fields: [userId], references: [id])
+  userId          String
+  receipts        Receipt[]
+  invoiceItems    InvoiceItem[]
+  invoicePayments InvoicePayment[]
+  docType         InvoiceDocType   @default(INVOICE)
+  docStatus       DocStatus        @default(ACTIVE)
+  createdAt       DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt       DateTime?        @db.Timestamptz(3)
+  createdBy       String?
+  updatedBy       String?
+  deletedBy       String?
+  syncStatus      SyncStatus       @default(PENDING)
+  syncedAt        DateTime?        @db.Timestamptz(3)
+  extraData       Json?
+  extraData1      Json?
+  extraData2      Json?
+  thirdPartyToolData Json?
+
+  @@index([invoiceNumber])
+  @@index([invoiceDate])
+  @@index([dueDate])
+  @@index([status])
+  @@index([orderId])
+}
+
+model Transaction {
+  id                     String           @id @default(cuid())
+  transactionId          String
+  amount                 Decimal          @db.Decimal(10, 2)
+  netAmount              Decimal          @db.Decimal(10, 2)
+  customerAccountBalance Decimal          @default(0) @db.Decimal(10, 2)
+  customerLifeTimeValue  Decimal          @default(0) @db.Decimal(10, 2)
+  currency               String           @default("INR")
+  status                 PaymentStatus    @default(PENDING)
+  paymentMethod          PaymentMethod    @default(CASH)
+  paymentDate            DateTime?        @db.Timestamptz(3)
+  paymentGateway         String?
+  paymentReference       String?
+  gatewayResponse        Json?
+  refundStatus           PaymentStatus?
+  refundAmount           Decimal?         @db.Decimal(10, 2)
+  refundDate             DateTime?        @db.Timestamptz(3)
+  place                  Place            @relation(fields: [placeId], references: [id])
+  placeId                String
+  placeName              String
+  orderId                String?
+  invoiceId              String?
+  saleDate               DateTime         @default(now()) @db.Timestamptz(3)
+  previousPurchaseDate   DateTime?        @db.Timestamptz(3)
+  receipt                Receipt?         @relation(fields: [receiptId], references: [id])
+  receiptId              String?
+  user                   User?            @relation(fields: [userId], references: [id])
+  userId                 String?
+  docType                DocType          @default(TRANSACTION)
+  docStatus              DocStatus        @default(ACTIVE)
+  createdAt              DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt              DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt              DateTime?        @db.Timestamptz(3)
+  createdBy              String?
+  updatedBy              String?
+  deletedBy              String?
+  syncStatus             SyncStatus       @default(PENDING)
+  syncedAt               DateTime?        @db.Timestamptz(3)
+  extraData              Json?
+  extraData1             Json?
+  extraData2             Json?
+  thirdPartyToolData     Json?
+  revenueCategory        String?
+  profitCenter           String?
+  costCenter             String?
+  customerSegment        String?
+  isFirstTransaction     Boolean          @default(false)
+  lifetimeValue          Decimal          @db.Decimal(10, 2)
+  entryParkingSession    ParkingSession[] @relation(name: "EntryTransaction")
+  exitParkingSession     ParkingSession[] @relation(name: "ExitTransaction")
+
+  @@unique([transactionId, saleDate])
+  @@index([transactionId])
+  @@index([placeId])
+  @@index([invoiceId])
+  @@index([orderId])
+  @@index([saleDate])
+  @@index([userId])
+  @@index([status])
+  @@index([paymentMethod])
+  @@index([saleDate, paymentMethod])
+  @@index([saleDate, status])
+  @@index([saleDate, placeId])
+}
+
+model VisitorBadge {
+  id                 String             @id @default(cuid())
+  badgeNumber        String?            @unique
+  badgeId            String             @unique
+  badgeType          BadgeType
+  status             BadgeStatus        @default(AVAILABLE)
+  visitor            User?              @relation("VisitorBadge", fields: [visitorId], references: [id])
+  visitorId          String?
+  issuedBy           User?              @relation("BadgeIssuer", fields: [issuedById], references: [id])
+  issuedById         String?
+  meeting            Meeting?           @relation(fields: [meetingId], references: [id])
+  meetingId          String?
+  issuedAt           DateTime?          @db.Timestamptz(3)
+  validTill          DateTime?          @db.Timestamptz(3)
+  docType            DocType            @default(VISITORBADGE)
+  docStatus          DocStatus          @default(ACTIVE)
+  createdAt          DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime?          @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  syncStatus         SyncStatus         @default(PENDING)
+  syncedAt           DateTime?          @db.Timestamptz(3)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+  IssuedVisitorBadge IssuedVisitorBadge[]
+
+  @@index([badgeNumber])
+  @@index([badgeId])
+  @@index([status])
+  @@index([validTill])
+  @@index([visitorId])
+  @@index([meetingId])
+}
+
+model IssuedVisitorBadge {
+  id           String       @id @default(cuid())
+  visitorBadge VisitorBadge? @relation(fields: [badgeId], references: [id])
+  badgeId      String
+  visitor      User?        @relation(fields: [visitorId], references: [id])
+  visitorId    String
+  issuedAt     DateTime     @default(now()) @db.Timestamptz(3)
+  issuedBy     User?        @relation(name: "BadgeIssuedBy", fields: [issuedById], references: [id])
+  issuedById   String
+  docType      DocType      @default(ISSUEDVISITORBADGE)
+  docStatus    DocStatus    @default(ACTIVE)
+  createdAt    DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime?    @db.Timestamptz(3)
+  createdBy    String?
+  updatedBy    String?
+  deletedBy    String?
+  syncStatus   SyncStatus   @default(PENDING)
+  syncedAt     DateTime?    @db.Timestamptz(3)
+  extraData    Json?
+  extraData1   Json?
+  extraData2   Json?
+  thirdPartyToolData Json?
+}
+
+model CountryStateCityLookup {
+  id                   String    @id @default(cuid())
+  countryISDCode       String
+  countryCode          String
+  countryName          String
+  stateCode            String
+  stateName            String
+  cityName             String
+  cityCode             String
+  timeZone             String
+  licencePlateAreaCode String?
+  licencePlateAreaName String?
+  currency             String
+  language             String
+  localeCode           String
+  localeName           String
+  numberFormat         Json?
+  addressFormat        Json?
+  docType              DocType   @default(COUNTRYSTATECITYLOOKUP)
+  docStatus            DocStatus @default(ACTIVE)
+  createdAt            DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime? @db.Timestamptz(3)
+  syncStatus           SyncStatus @default(PENDING)
+  syncedAt             DateTime? @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+
+  @@index([countryCode, stateCode, cityCode])
+  @@index([licencePlateAreaCode])
+  @@index([localeCode])
+}
+
+model AuditLog {
+  id                 String    @id @default(cuid())
+  entityType         String
+  entityId           String
+  action             String
+  changes            Json
+  ipAddress          String?
+  userAgent          String?
+  user               User      @relation(fields: [userId], references: [id])
+  userId             String
+  timestamp          DateTime  @default(now()) @db.Timestamptz(3)
+  docType            DocType   @default(AUDITLOG)
+  docStatus          DocStatus @default(ACTIVE)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt          DateTime? @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  syncStatus         SyncStatus @default(PENDING)
+  syncedAt           DateTime? @db.Timestamptz(3)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+  complianceLevel    String?
+  riskLevel          String?
+
+  @@index([timestamp, entityType, action])
+  @@index([timestamp, entityType])
+  @@index([timestamp, userId])
+  @@index([timestamp, action])
+}
+
+model InvoiceItem {
+  id           String    @id @default(cuid())
+  invoice      Invoice   @relation(fields: [invoiceId], references: [id])
+  invoiceId    String
+  itemName     String
+  description  String
+  quantity     Int
+  unitPrice    Decimal   @db.Decimal(10, 2)
+  salePrice    Decimal?  @db.Decimal(10, 2)
+  sellingPrice Decimal   @db.Decimal(10, 2)
+  taxRate      Decimal   @db.Decimal(5, 2)
+  taxAmount    Decimal   @db.Decimal(10, 2)
+  totalAmount  Decimal   @db.Decimal(10, 2)
+  docType      DocType   @default(INVOICEITEM)
+  docStatus    DocStatus @default(ACTIVE)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
+  deletedAt    DateTime? @db.Timestamptz(3)
+  createdBy    String?
+  updatedBy    String?
+  deletedBy    String?
+  syncStatus   SyncStatus @default(PENDING)
+  syncedAt     DateTime? @db.Timestamptz(3)
+  extraData    Json?
+  extraData1   Json?
+  extraData2   Json?
+  thirdPartyToolData Json?
+
+  @@index([invoiceId])
+  @@index([itemName])
+  @@index([sellingPrice])
+}
+
+model InvoicePayment {
+  id                String        @id @default(cuid())
+  invoice           Invoice       @relation(fields: [invoiceId], references: [id])
+  invoiceId         String
+  place             Place         @relation(fields: [placeId], references: [id])
+  placeId           String
+  placeName         String
+  paidAmount        Decimal       @db.Decimal(10, 2)
+  adjustedAmount    Decimal       @db.Decimal(10, 2)
+  pendingAmount     Decimal       @db.Decimal(10, 2)
+  adjustmentDetails Json?
+  method            PaymentMethod
+  reference         String?
+  paymentTiming     PaymentTiming @default(NA)
+  paidAt            DateTime      @default(now()) @db.Timestamptz(3)
+  docType           DocType       @default(INVOICEPAYMENT)
+  docStatus         DocStatus     @default(ACTIVE)
+  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?     @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  syncStatus        SyncStatus    @default(PENDING)
+  syncedAt          DateTime?     @db.Timestamptz(3)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+
+  @@index([invoiceId])
+  @@index([placeId])
+  @@index([paidAt])
+  @@index([paymentTiming])
+  @@index([method])
+}
+
+model AssetMaintenance {
+  id             String            @id @default(cuid())
+  asset          Asset             @relation(fields: [assetId], references: [id])
+  assetId        String
+  jobId          String            @unique
+  type           String
+  description    String
+  requestorNotes String?
+  priorityLevel  MaintenancePriority
+  assignedTo     User              @relation(name: "MaintenanceAssignee", fields: [assignedToId], references: [id])
+  assignedToId   String
+  vendorOrg      Organization      @relation(name: "MaintenanceVendor", fields: [vendorOrgId], references: [id])
+  vendorOrgId    String
+  requestedBy    User              @relation(name: "MaintenanceRequester", fields: [requestedById], references: [id])
+  requestedById  String
+  scheduledAt    DateTime          @db.Timestamptz(3)
+  startedAt      DateTime?         @db.Timestamptz(3)
+  completedAt    DateTime?         @db.Timestamptz(3)
+  reviewedBy     User?             @relation(name: "MaintenanceReviewer", fields: [reviewedById], references: [id])
+  reviewedById   String?
+  approvedBy     User?             @relation(name: "MaintenanceApprover", fields: [approvedById], references: [id])
+  approvedById   String?
+  approvedAt     DateTime?         @db.Timestamptz(3)
+  cost           Decimal?          @db.Decimal(10, 2)
+  commentHistory Json?
+  feedback       String?
+  rating         Int?              @default(0)
+  docType        DocType           @default(ASSETMAINTENANCE)
+  docStatus      DocStatus         @default(ACTIVE)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime          @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?         @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus        @default(PENDING)
+  syncedAt       DateTime?         @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+
+  @@index([jobId])
+  @@index([priorityLevel])
+  @@index([assignedToId])
+  @@index([vendorOrgId])
+  @@index([requestedById])
+  @@index([scheduledAt, startedAt, completedAt])
+  @@index([approvedById, approvedAt])
+  @@index([rating])
+}
+
+
+model AssetUsageLog {
+  id                String            @id @default(cuid())
+  asset             Asset             @relation(fields: [assetId], references: [id])
+  assetId           String
+  user              User              @relation(fields: [userId], references: [id])
+  userId            String
+  reservation       Reservation?      @relation(fields: [reservationId], references: [id])
+  reservationId     String?
+  organization      Organization      @relation(fields: [orgId], references: [id])
+  orgId             String
+  reservationModule ReservationModule
+  facilityId        String?
+  facilityType      FacilityType?
+  startTime         DateTime          @default(now()) @db.Timestamptz(3)
+  endTime           DateTime?         @db.Timestamptz(3)
+  purpose           String?
+  docType           DocType           @default(ASSETUSAGELOG)
+  docStatus         DocStatus         @default(ACTIVE)
+  createdAt         DateTime          @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime          @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?         @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  syncStatus        SyncStatus        @default(PENDING)
+  syncedAt          DateTime?         @db.Timestamptz(3)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+  usageDuration     Int?
+  peakTimeUsage     Boolean           @default(false)
+  utilizationRate   Decimal           @db.Decimal(5, 2)
+  assetCategory     String?
+  usageType         String?
+  usageEfficiency   Decimal           @db.Decimal(5, 2)
+  peakUsageStatus   PeakUsageStatus   @default(OFF_PEAK)
+
+  @@unique([assetId, startTime])
+  @@index([reservationId])
+  @@index([orgId])
+  @@index([facilityId, facilityType])
+  @@index([startTime, endTime])
+  @@index([startTime, assetId])
+  @@index([startTime, facilityType])
+  @@index([startTime, userId])
+  @@index([startTime, assetId, userId])
+}
+
+model Lane {
+  id                  String           @id @default(cuid())
+  name                String?
+  sequenceNumber      Int
+  laneType            LaneType
+  vehicleType         VehicleType
+  floorOrLevel        String?
+  geolocation         Json?
+  place               Place            @relation(fields: [placeId], references: [id])
+  placeId             String
+  docType             DocType          @default(LANE)
+  docStatus           DocStatus        @default(ACTIVE)
+  createdAt           DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt           DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt           DateTime?        @db.Timestamptz(3)
+  createdBy           String?
+  updatedBy           String?
+  deletedBy           String?
+  syncStatus          SyncStatus       @default(PENDING)
+  syncedAt            DateTime?        @db.Timestamptz(3)
+  extraData           Json?
+  extraData1          Json?
+  extraData2          Json?
+  thirdPartyToolData  Json?
+  ParkedVehicles      ParkedVehicles[]
+  EntryParkingSession ParkingSession[] @relation(name: "EntryLane")
+  Asset               Asset[]          @relation(name: "AssetOfLane")
+  ExitParkingSession  ParkingSession[] @relation(name: "ExitLane")
+  devices             Device[]
+
+  @@index([laneType])
+  @@index([vehicleType])
+  @@index([floorOrLevel])
+  @@index([sequenceNumber])
+}
+
+model ParkedVehicles {
+  id                   String                @id @default(cuid())
+  status               ParkedVehicleStatus   @default(IN)
+  vehicle              Vehicle               @relation(fields: [vehicleId], references: [id])
+  vehicleId            String
+  vehicleNumber        String
+  licencePlateAreaCode String?
+  licencePlateAreaName String?
+  vehicleType          VehicleType
+  floorOrLevel         String?
+  geolocation          Json?
+  parkingSpot          ParkingSpot           @relation(fields: [parkingSpotId], references: [id])
+  parkingSpotId        String
+  lane                 Lane                  @relation(fields: [laneId], references: [id])
+  laneId               String
+  pass                 Pass?                 @relation(fields: [passId], references: [id])
+  passId               String?
+  visitor              User?                 @relation("VisitorParking", fields: [visitorId], references: [id])
+  visitorId            String?
+  employee             User?                 @relation("EmployeeParking", fields: [employeeId], references: [id])
+  employeeId           String?
+  checkinDatetime      DateTime              @default(now()) @db.Timestamptz(3)
+  checkoutDatetime     DateTime?             @db.Timestamptz(3)
+  enteredBy            User                  @relation("EntryAttendant", fields: [enteredById], references: [id])
+  enteredById          String
+  exitedBy             User?                 @relation("ExitAttendant", fields: [exitedById], references: [id])
+  exitedById           String?
+  isForcedOut          Boolean               @default(false)
+  rateChart            ParkingRateChart?     @relation(fields: [rateChartId], references: [id])
+  rateChartId          String?
+  paymentMethod        PaymentMethod?
+  paymentStatus        PaymentStatus         @default(PENDING)
+  totalAmount          Float?
+  entryAmount          Float?
+  exitAmount           Float?
+  invoiceNumber        String?
+  transactionId        String?
+  entryPhotoUrl        String?
+  exitPhotoUrl         String?
+  parkingActivationMode ParkingActivationMode
+  parkerTypes          ParkerType[]
+  feedback             String?
+  rating               Int?                  @default(0)
+  docType              DocType               @default(PARKINGSESSION) // Should this be PARKEDVEHICLE? Assuming PARKSESSION based on original
+  docStatus            DocStatus             @default(ACTIVE)
+  createdAt            DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime              @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?             @db.Timestamptz(3)
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  syncStatus           SyncStatus            @default(PENDING)
+  syncedAt             DateTime?             @db.Timestamptz(3)
+  extraData            Json?
+  extraData1           Json?
+  extraData2           Json?
+  thirdPartyToolData   Json?
+  licensePlateArea     String?
+  vehicleCategory      String?
+  isRegularVehicle     Boolean               @default(false)
+  lastVisitDate        DateTime?             @db.Timestamptz(3)
+  visitCount           Int                   @default(0)
+
+  @@unique([transactionId, checkinDatetime])
+  @@unique([vehicleNumber, checkinDatetime])
+  @@index([vehicleNumber])
+  @@index([status])
+  @@index([vehicleType])
+  @@index([parkingSpotId])
+  @@index([checkinDatetime])
+  @@index([checkoutDatetime])
+  @@index([paymentStatus])
+  @@index([transactionId])
+  @@index([checkinDatetime, status])
+  @@index([checkinDatetime, vehicleType])
+  @@index([checkinDatetime, parkingSpotId])
+}
+
+
+model PlaceVisits {
+  id          String           @id @default(cuid())
+  user        User             @relation(fields: [userId], references: [id])
+  userId      String
+  place       Place            @relation(fields: [placeId], references: [id])
+  placeId     String
+  placeName   String
+  sessionId   String
+  sessionType PlaceSessionType
+  docType     DocType          @default(VISIT) // Should probably be PLACEVISIT? Keeping original for now
+  docStatus   DocStatus        @default(ACTIVE)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt   DateTime?        @db.Timestamptz(3)
+  createdBy   String?
+  updatedBy   String?
+  deletedBy   String?
+  syncStatus  SyncStatus       @default(PENDING)
+  syncedAt    DateTime?        @db.Timestamptz(3)
+  extraData   Json?
+  extraData1  Json?
+  extraData2  Json?
+  thirdPartyToolData Json?
+
+  @@index([userId])
+  @@index([placeId])
+  @@index([sessionId, sessionType])
+  @@index([createdAt])
+}
+
+model Meeting {
+  id             String       @id @default(cuid())
+  agenda         String
+  meetingType    MeetingType
+  visitType      VisitType    @default(SCHEDULED)
+  startTime      DateTime     @db.Timestamptz(3)
+  endTime        DateTime     @db.Timestamptz(3)
+  meetingPurpose String?
+  reasonForVisit String?
+  comingFrom     String?
+  room           Asset?       @relation(name: "RoomAsset", references: [id], fields: [roomId])
+  roomId         String?
+  hostPlace      Place        @relation(fields: [hostPlaceId], references: [id])
+  hostPlaceId    String
+  host           User         @relation(name: "Host", fields: [hostId], references: [id])
+  hostId         String
+  hostOrg        Organization @relation(name: "Host Organization", fields: [hostOrgId], references: [id])
+  hostOrgId      String
+  visitor        User         @relation(name: "Visitor", fields: [visitorId], references: [id])
+  visitorId      String
+  visitorOrg     Organization @relation(name: "Visitor Organization", fields: [visitorOrgId], references: [id])
+  visitorOrgId   String
+  companions     Json?
+  checkInStatus  CheckStatus  @default(PENDING)
+  checkOutStatus CheckStatus  @default(PENDING)
+  visits         Visit[]
+  invites        Invite[]
+  reservations   Reservation[]
+  visitorBadges  VisitorBadge[]
+  docType        DocType      @default(MEETING)
+  docStatus      DocStatus    @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?    @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus   @default(PENDING)
+  syncedAt       DateTime?    @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+
+  @@index([startTime, endTime])
+  @@index([visitType])
+  @@index([checkInStatus])
+  @@index([checkOutStatus])
+  @@index([visitorId])
+  @@index([hostId])
+}
+
+model Invite {
+  id             String       @id @default(cuid())
+  meeting        Meeting      @relation(fields: [meetingId], references: [id])
+  meetingId      String
+  status         InviteStatus @default(ACCEPTED)
+  visitor        User         @relation(name: "Visitor", fields: [visitorId], references: [id])
+  visitorId      String
+  vistorOrg      Organization @relation(name: "Visitor Organization", fields: [visitorOrgId], references: [id])
+  visitorOrgId   String
+  inviteCode     String       @unique @default(uuid())
+  inviteQrString String?
+  inviteQrUrl    String?
+  sampleData     Json?
+  docType        DocType      @default(INVITE)
+  docStatus      DocStatus    @default(ACTIVE)
+  createdAt      DateTime     @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @db.Timestamptz(3)
+  deletedAt      DateTime?    @db.Timestamptz(3)
+  createdBy      String?
+  updatedBy      String?
+  deletedBy      String?
+  syncStatus     SyncStatus   @default(PENDING)
+  syncedAt       DateTime?    @db.Timestamptz(3)
+  extraData      Json?
+  extraData1     Json?
+  extraData2     Json?
+  thirdPartyToolData Json?
+
+  @@index([meetingId])
+  @@index([visitorId])
+  @@index([inviteCode])
+}
+
+model Receipt {
+  id                String             @id @default(cuid())
+  receiptNumber     String             @unique
+  receiptDate       DateTime           @default(now()) @db.Timestamptz(3)
+  amount            Float
+  paymentMethod     PaymentMethod
+  transactionId     String?            @unique
+  currency          String             @default("INR")
+  receiptTemplateId String?
+  printStatus       PrintStatus        @default(PENDING)
+  sentToUser        Boolean            @default(false)
+  sentToUserBy      NotificationMedium[]
+  invoice           Invoice?           @relation(fields: [invoiceId], references: [id])
+  invoiceId         String?
+  user              User               @relation(fields: [userId], references: [id])
+  userId            String
+  organization      Organization       @relation(fields: [organizationId], references: [id])
+  organizationId    String
+  transaction       Transaction[]
+  docType           DocType            @default(RECEIPT)
+  docStatus         DocStatus          @default(ACTIVE)
+  createdAt         DateTime           @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime           @updatedAt @db.Timestamptz(3)
+  deletedAt         DateTime?          @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+}
+
+model PriceTag {
+  id                         String               @id @default(cuid())
+  tagCode                    String
+  tagDisplayName             String
+  tagDescription             String
+  defaultComment             String
+  commentMandatory           Boolean
+  commentEditable            Boolean
+  amount                     Float
+  amountEditable             Boolean
+  modifierType               ModifierType
+  place                      Place                @relation(fields: [placeId], references: [id])
+  placeId                    String
+  organization               Organization?        @relation(fields: [organizationId], references: [id])
+  organizationId             String?
+  minTimeInMins              Int?
+  maxTimeInMins              Int?
+  validFrom                  DateTime?            @db.Timestamptz(3)
+  validTill                  DateTime?            @db.Timestamptz(3)
+  shoppingBillNeeded         Boolean
+  shoppingBillPhotoNeeded    Boolean
+  shoppingBillAmountRequired Boolean
+  shoppingBillModifierType   ShoppingBillModifier
+  docType                    DocType              @default(PRICETAG)
+  docStatus                  DocStatus            @default(ACTIVE)
+  createdAt                  DateTime             @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime             @updatedAt @db.Timestamptz(3)
+  deletedAt                  DateTime?            @db.Timestamptz(3)
+  createdBy                  String?
+  updatedBy                  String?
+  deletedBy                  String?
+  syncStatus                 SyncStatus           @default(PENDING)
+  syncedAt                   DateTime?            @db.Timestamptz(3)
+  extraData                  Json?
+  extraData1                 Json?
+  extraData2                 Json?
+  thirdPartyToolData         Json?
+  parkingSessions            ParkingSession[]     @relation(name: "entryPriceTag")
+
+  @@index([validFrom, validTill])
+}
+
+
+model User {
+  id                         String                @id @default(cuid())
+  email                      String                @unique
+  passwordHash               String?
+  firstName                  String
+  lastName                   String
+  phone                      String?               @unique
+  photoMedia                 Media?                @relation(name: "userPhoto", references: [id], fields: [photoMediaId])
+  photoMediaId               String?
+  govIdNumber                String?               @unique
+  govIdMedia                 Media?                @relation(name: "userGovId", references: [id], fields: [govIdMediaId])
+  govIdMediaId               String?
+  userStatus                 UserStatus?           @default(DISABLED)
+  placeWorker                Json?
+  userTokens                 Json?
+  valetSessions              ParkingSession[]      @relation("ValetDriver")
+  valetProfile               Json?
+  visitsAsHost               Visit[]               @relation(name: "Host")
+  userOrganizations          UserOrganization[]
+  userPlaces                 UserPlace[]
+  meetingsAsHost             Meeting[]             @relation(name: "Host")
+  meetingsAsVisitor          Invite[]              @relation(name: "Visitor")
+  userProfile                UserProfile?
+  userPreference             UserPreference?
+  userSocialProfiles         UserSocialProfile[]
+  userVerification           UserVerification?
+  assets                     Asset[]               @relation(name: "AssetsOfUser")
+  visits                     Visit[]               @relation(name: "Visitor")
+  passes                     Pass[]
+  employeeParking            ParkingSession[]      @relation(name: "EmployeeParking")
+  visitorParking             ParkingSession[]      @relation(name: "VisitorParking")
+  vehicles                   Vehicle[]
+  attendantEntryParking      ParkingSession[]      @relation(name: "ExitAttendant")
+  attendantExitParking       ParkingSession[]      @relation(name: "EntryAttendant")
+  reservations               Reservation[]         @relation(name: "ParkingReservation")
+  parkingReceipts            ParkingReceipt[]      @relation(name: "ParkingReceipt")
+  parkingReceiptsByAttendant ParkingReceipt[]      @relation(name: "ReceiptByAttendant")
+  createdAt                  DateTime              @default(now()) @db.Timestamptz(3)
+  updatedAt                  DateTime              @updatedAt @db.Timestamptz(3)
+  deletedAt                  DateTime?             @db.Timestamptz(3)
+  createdBy                  String?
+  updatedBy                  String?
+  deletedBy                  String?
+  refreshToken               String?
+  docType                    DocType               @default(USER)
+  docStatus                  DocStatus             @default(ACTIVE)
+  isSystemUser               Boolean?              @default(false)
+  extraData                  Json?
+  extraData1                 Json?
+  extraData2                 Json?
+  thirdPartyToolData         Json?
+  visitorBadges              IssuedVisitorBadge[]
+  issuedVisitorBadges        IssuedVisitorBadge[]  @relation(name: "BadgeIssuedBy")
+  receipts                   Receipt[]
+  transactions               Transaction[]
+  invoice                    Invoice[]
+  auditlogs                  AuditLog[]
+  assetUsageLogs             AssetUsageLog[]
+  Session                    Session[]
+  PlaceVisits                PlaceVisits[]
+  visitorParkedVehicles      ParkedVehicles[]      @relation("VisitorParking")
+  employeeParkedVehicles     ParkedVehicles[]      @relation("EmployeeParking")
+  entryAttendantParkedVehicles ParkedVehicles[]   @relation("EntryAttendant")
+  exitAttendantParkedVehicles ParkedVehicles[]    @relation("ExitAttendant")
+  assigneeAssetMaintenance   AssetMaintenance[]    @relation(name: "MaintenanceAssignee")
+  requesterAssetMaintenance  AssetMaintenance[]    @relation(name: "MaintenanceRequester")
+  reviewerAssetMaintenance   AssetMaintenance[]    @relation(name: "MaintenanceReviewer")
+  approverAssetMaintenance   AssetMaintenance[]    @relation(name: "MaintenanceApprover")
+  VisitorBadge               VisitorBadge[]        @relation("VisitorBadge")
+  issuerVisitorBadge         VisitorBadge[]        @relation("BadgeIssuer")
+  MarketingTag               MarketingTag[]
+  MarketingEnrolments        MarketingEnrolments[]
+  subscriberNotification     Notification[]        @relation("Subscriber")
+  publisherNotification      Notification[]        @relation("Publisher")
+  Meeting                    Meeting[]             @relation(name: "Visitor")
+  isValetDriver              Boolean               @default(false)
+  driverStatus               ValetDriverStatus?
+  driverShift                ValetShift[]
+  valetRequests              ValetRequest[]
+  inspectedVehicles          VehicleCondition[]
+  driverProfile              Json?
+  ValetZone                  ValetZone[]
+  UserAuth                   UserAuth[]
+  pmsWorkerSessions          PMSWorkerSession[]
+  createdPasses              Pass[]                @relation(name: "passCreatedBy")
+  deviceId                   String?               @unique
+  pushToken                  String?
+  subscriberId               String?               @unique
+  notifications              Notification[]
+
+  @@index([subscriberId])
+}
+
+model PMSWorkerSession {
+  id                   String           @id @default(cuid())
+  user                 User             @relation(fields: [userId], references: [id])
+  userId               String
+  sessionStart         DateTime         @db.Timestamptz(3)
+  sessionEnd           DateTime?        @db.Timestamptz(3)
+  businessDate         DateTime?        @db.Timestamptz(3)
+  sessionType          PlaceSessionType @default(PMS)
+  place                Place?           @relation(fields: [placeId], references: [id])
+  placeId              String?
+  createdBy            String?
+  updatedBy            String?
+  deletedBy            String?
+  createdAt            DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt            DateTime         @updatedAt @db.Timestamptz(3)
+  deletedAt            DateTime?        @db.Timestamptz(3)
+  entryParkingSessions ParkingSession[] @relation(name: "EntryWorkerSession")
+  exitParkingSessions  ParkingSession[] @relation(name: "ExitWorkerSession")
+}
+
+model UserAuth {
+  id         String     @id @default(cuid())
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
+  authSource AuthSource
+  authId     String
+  createdAt  DateTime   @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime   @updatedAt @db.Timestamptz(3)
+  deletedAt  DateTime?  @db.Timestamptz(3)
+  createdBy  String?
+  updatedBy  String?
+  deletedBy  String?
+
+  @@unique([userId])
+  @@unique([authSource, authId])
+}
+
+model ValetShift {
+  id                 String    @id @default(cuid())
+  driver             User      @relation(fields: [driverId], references: [id])
+  driverId           String
+  startTime          DateTime  @db.Timestamptz(3)
+  endTime            DateTime? @db.Timestamptz(3)
+  status             String
+  totalTrips         Int       @default(0)
+  assignedZone       String?
+  breakTimes         Json?
+  vehiclesHandled    Int       @default(0)
+  performanceMetrics Json?
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(3)
+  docType            DocType   @default(VALETSHIFT)
+  docStatus          DocStatus @default(ACTIVE)
+  deletedAt          DateTime? @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  refreshToken       String?
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+
+  // ==== MODIFICATION: Added on_duty field ====
+  on_duty Boolean @default(false)
+
+  @@index([driverId, status])
+  @@index([startTime, endTime])
+}
+
+
+model Version {
+  id              String   @id @default(cuid())
+  entityId        String
+  entityType      DocType
+  versionNumber   Int
+  changeType      String
+  changedFields   String[]
+  previousVersion Int?
+  data            Json
+  reason          String?
+  createdAt       DateTime @default(now()) @db.Timestamptz(3)
+  createdBy       String?
+
+  // Document metadata
+  docType   DocType   @default(VERSION)
+  docStatus DocStatus @default(ACTIVE)
+
+  @@unique([entityId, entityType, versionNumber])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+model SyncLog {
+  id             String     @id @default(cuid())
+  clientDeviceId String
+  tableName      String
+  syncStatus     SyncStatus
+  syncDetails    String
+  createdAt      DateTime   @default(now()) @db.Timestamptz(3)
+
+  // Document metadata
+  docType   DocType   @default(SYNCLOG)
+  docStatus DocStatus @default(ACTIVE)
+}
+
+
+model ParkingOccupancy {
+  id                 String    @id @default(cuid())
+  timestamp          DateTime  @db.Timestamptz(3)
+  placeId            String
+  spotId             String
+  isOccupied         Boolean
+  vehicleType        String?
+  sessionId          String?
+  createdAt          DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(3)
+  docType            DocType   @default(PARKINGOCCUPANCY)
+  docStatus          DocStatus @default(ACTIVE)
+  deletedAt          DateTime? @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  refreshToken       String?
+  isSystemUser       Boolean?  @default(false)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+
+  @@index([timestamp, placeId])
+}
+
+model ValetMetrics {
+  id                String    @id @default(cuid())
+  timestamp         DateTime  @db.Timestamptz(3)
+  driverId          String
+  averageRetrieval  Float
+  customerRating    Float?
+  completedRequests Int
+  pendingRequests   Int
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+  docType           DocType   @default(VALETMETRICS)
+  docStatus         DocStatus @default(ACTIVE)
+  deletedAt         DateTime? @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+  refreshToken      String?
+  isSystemUser      Boolean?  @default(false)
+  extraData         Json?
+  extraData1        Json?
+  extraData2        Json?
+  thirdPartyToolData Json?
+
+  @@index([timestamp, driverId])
+}
+
+model ValetRequest {
+  id                 String           @id @default(cuid())
+  requestType        ValetRequestType
+  status             String
+  priority           Int              @default(0)
+  parkingSession     ParkingSession   @relation(fields: [sessionId], references: [id])
+  sessionId          String
+  assignedDriver     User?            @relation(fields: [driverId], references: [id])
+  driverId           String?
+  requestedAt        DateTime         @default(now()) @db.Timestamptz(3)
+  completedAt        DateTime?        @db.Timestamptz(3)
+  createdAt          DateTime         @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime         @updatedAt @db.Timestamptz(3)
+  docType            DocType          @default(VALETREQUEST)
+  docStatus          DocStatus        @default(ACTIVE)
+  deletedAt          DateTime?        @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  refreshToken       String?
+  isSystemUser       Boolean?         @default(false)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+  statusHistory      Json?
+  estimatedTime      Int?
+  customerNotes      String?
+  systemNotes        String?
+  priorityReason     String?
+  ValetZone          ValetZone[]
+}
+
+model VehicleCondition {
+  id                 String                 @id @default(cuid())
+  parkingSession     ParkingSession         @relation(fields: [sessionId], references: [id])
+  sessionId          String
+  status             VehicleConditionStatus
+  checkType          String
+  notes              String?
+  inspectedBy        User                   @relation(fields: [inspectorId], references: [id])
+  inspectorId        String
+  inspectedAt        DateTime               @default(now()) @db.Timestamptz(3)
+  damageDetails      Json?
+  photoUrls          String[]
+  createdAt          DateTime               @default(now()) @db.Timestamptz(3)
+  updatedAt          DateTime               @updatedAt @db.Timestamptz(3)
+  docType            DocType                @default(VEHICLECONDITION)
+  docStatus          DocStatus              @default(ACTIVE)
+  deletedAt          DateTime?              @db.Timestamptz(3)
+  createdBy          String?
+  updatedBy          String?
+  deletedBy          String?
+  refreshToken       String?
+  isSystemUser       Boolean?               @default(false)
+  extraData          Json?
+  extraData1         Json?
+  extraData2         Json?
+  thirdPartyToolData Json?
+}
+
+model ValetZone {
+  id              String         @id @default(cuid())
+  name            String
+  capacity        Int
+  currentLoad     Int            @default(0)
+  assignedDrivers User[]
+  activeRequests  ValetRequest[]
+  status          String
+  operatingHours  Json
+  createdAt       DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt       DateTime       @updatedAt @db.Timestamptz(3)
+  docType         DocType        @default(VEHICLECONDITION) // Should this be VALETZONE?
+  docStatus       DocStatus      @default(ACTIVE)
+  deletedAt       DateTime?      @db.Timestamptz(3)
+  createdBy       String?
+  updatedBy       String?
+  deletedBy       String?
+  refreshToken    String?
+  isSystemUser    Boolean?       @default(false)
+  extraData       Json?
+  extraData1      Json?
+  extraData2      Json?
+  thirdPartyToolData Json?
+
+  @@index([status])
+  @@index([currentLoad])
+}
+
+model PMSSetting {
+  id                String        @id @default(cuid())
+  place             Place?        @relation(fields: [placeId], references: [id])
+  placeId           String?
+  organization      Organization? @relation(fields: [orgId], references: [id])
+  orgId             String?
+  prepaidPayment    Boolean?      @default(true)
+  paymentModes      PaymentMethod[]
+  flatPricing       Boolean?      @default(true)
+  printTicketQR     Boolean?      @default(true)
+  printPassQR       Boolean?      @default(true)
+  ticketTemplate    Media?        @relation(name: "ticketTemplate", fields: [ticketTemplateId], references: [id])
+  ticketTemplateId  String?
+  passTemplate      Media?        @relation(name: "passTemplate", fields: [passTemplateId], references: [id])
+  passTemplateId    String?
+  receiptTemplate   Media?        @relation(name: "receiptTemplate", fields: [receiptTemplateId], references: [id])
+  receiptTemplateId String?
+  startTime         String?       @default("00:00")
+  createdAt         DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime      @updatedAt @db.Timestamptz(3)
+  docType           DocType       @default(PMSSETTING)
+  docStatus         DocStatus     @default(ACTIVE)
+  deletedAt         DateTime?     @db.Timestamptz(3)
+  createdBy         String?
+  updatedBy         String?
+  deletedBy         String?
+}
+
+// --- Notification System Models (Remain unchanged) ---
+
+model UserGroup {
+  id               String @id @default(cuid())
+  groupName        String @unique
+  commonProperties Json   @default("{}")
+}
+
+model Topic {
+  id            String         @id @default(cuid())
+  topicKey      String         @unique
+  topicName     String
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  notifications Notification[]
+  conversations Conversation[]
+
+  @@index([topicKey])
+}
+
+
+model Message {
+  id                   String @id @default(cuid())
+  notificationObject   NotificationObject  @relation(fields: [notificationObjectId], references: [id])
+  notificationObjectId String
+  timestamp            DateTime            @default(now())
+  stepId               String?
+  content              String              @db.Text
+  notification         Notification?       @relation(fields: [notificationId], references: [id])
+  notificationId       String?             @unique
+  conversation         Conversation?       @relation(fields: [conversationId], references: [id])
+  conversationId       String?
+  channel              NotificationChannel
+
+  @@index([notificationObjectId])
+  @@index([conversationId])
+}
+
+model Conversation {
+  id          String     @id @default(cuid())
+  topic     Topic     @relation(fields: [topicId], references: [id])
+  topicId   String
+  startDate DateTime  @default(now())
+  endDate   DateTime?
+  messages  Message[]
+
+  @@index([topicId])
+}
+
+// END OF UPDATED schema.prisma FILE
